@@ -1,7 +1,7 @@
 # week3_navigation
-Nama : Achmad Anval Adhiem Allain
-NIM  : 244107020039
-Kelas: TI-3E
+Nama : Bagas Ardiansa Putra
+NIM  : 244107020166
+Kelas: TI-3D
 
 Pada Week 3 ini kita mempelajari cara melakukan navigasi pada aplikasi Flutter dengan menggunakan go_router.
 
