@@ -40,7 +40,7 @@ class ProfileCard extends StatelessWidget {
                     'Nama Mahasiswa',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Text('Achmad Anval Adheim Allain'),
+                  Text('Bagas Ardiansa Putra'),
                 ],
               ),
             ],
@@ -49,19 +49,19 @@ class ProfileCard extends StatelessWidget {
           const Row(
             children: [
               Expanded(child: Text('NIM')),
-              Text('244107020039'),
+              Text('244107020166'),
             ],
           ),
           const Row(
             children: [
               Expanded(child: Text('Kelas')),
-              Text('TI-3E'),
+              Text('TI-3D'),
             ],
           ),
           const Row(
             children: [
               Expanded(child: Text('Email')),
-              Text('anvalalan@gmail.com'),
+              Text('bagasardiansa06@gmail.com'),
             ],
           ),
         ],
