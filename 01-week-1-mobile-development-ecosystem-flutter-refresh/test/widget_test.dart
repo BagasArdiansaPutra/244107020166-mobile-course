@@ -8,8 +8,8 @@ void main() {
 
     // Verify student name and details are displayed.
     expect(find.text('Profil Mahasiswa'), findsOneWidget);
-    expect(find.text('Achmad Anval Adhiem Allain'), findsOneWidget);
-    expect(find.text('244107020039'), findsOneWidget);
-    expect(find.text('Teknik Informatika'), findsOneWidget);
+    expect(find.text('Bagas Ardiansa Putra'), findsOneWidget);
+    expect(find.text('244107020166'), findsOneWidget);
+    expect(find.text('TI-3D'), findsOneWidget);
   });
 }
