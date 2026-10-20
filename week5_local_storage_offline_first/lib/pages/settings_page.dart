@@ -30,7 +30,8 @@ class SettingsPage extends ConsumerWidget {
             SwitchListTile(
               title: const Text('Simulasi offline'),
               subtitle: const Text(
-                  'Paksa mode offline untuk demo & testing cache-first'),
+                'Paksa mode offline untuk demo & testing cache-first',
+              ),
               value: forceOffline,
               onChanged: (value) =>
                   ref.read(forceOfflineProvider.notifier).set(value),
@@ -39,9 +40,7 @@ class SettingsPage extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.history),
               title: const Text('Terakhir dibuka'),
-              subtitle: Text(
-                lastOpenedAsync.value ?? 'Belum pernah dicatat',
-              ),
+              subtitle: Text(lastOpenedAsync.value ?? 'Belum pernah dicatat'),
             ),
           ],
         ),

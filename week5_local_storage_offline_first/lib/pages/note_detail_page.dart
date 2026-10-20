@@ -19,9 +19,8 @@ class NoteDetailPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) =>
             Center(child: Text('Gagal memuat catatan: $error')),
-        data: (note) => note == null
-            ? const _NotFoundView()
-            : _NoteDetail(note: note),
+        data: (note) =>
+            note == null ? const _NotFoundView() : _NoteDetail(note: note),
       ),
     );
   }

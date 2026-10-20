@@ -11,10 +11,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/notes',
     routes: [
-      GoRoute(
-        path: '/notes',
-        builder: (context, state) => const NotesPage(),
-      ),
+      GoRoute(path: '/notes', builder: (context, state) => const NotesPage()),
       GoRoute(
         path: '/note/:id',
         builder: (context, state) {
@@ -27,10 +24,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return NoteDetailPage(noteId: id);
         },
       ),
-      GoRoute(
-        path: '/posts',
-        builder: (context, state) => const PostsPage(),
-      ),
+      GoRoute(path: '/posts', builder: (context, state) => const PostsPage()),
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),

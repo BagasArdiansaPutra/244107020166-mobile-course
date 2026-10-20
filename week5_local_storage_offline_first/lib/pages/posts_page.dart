@@ -122,8 +122,10 @@ class _ErrorView extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Text('Gagal memuat postingan:\n$message',
-            textAlign: TextAlign.center),
+        child: Text(
+          'Gagal memuat postingan:\n$message',
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

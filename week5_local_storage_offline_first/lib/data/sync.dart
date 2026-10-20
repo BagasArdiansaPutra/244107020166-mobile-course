@@ -10,7 +10,7 @@ import 'repositories/note_repository.dart';
 /// agar [NoteRepository] dan [PostRepository] tetap fokus pada CRUD.
 class SyncService {
   SyncService({Future<Database> Function()? openDb})
-      : _openDb = openDb ?? openNotesDb;
+    : _openDb = openDb ?? openNotesDb;
 
   final Future<Database> Function() _openDb;
 
@@ -28,15 +28,11 @@ class SyncService {
     final batch = db.batch();
     final cachedAt = DateTime.now().toIso8601String();
     for (final post in posts) {
-      batch.insert(
-        'cached_posts',
-        {
-          'id': post.id,
-          'payload': jsonEncode(post.toJson()),
-          'cached_at': cachedAt,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      batch.insert('cached_posts', {
+        'id': post.id,
+        'payload': jsonEncode(post.toJson()),
+        'cached_at': cachedAt,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
     }
     await batch.commit(noResult: true);
   }

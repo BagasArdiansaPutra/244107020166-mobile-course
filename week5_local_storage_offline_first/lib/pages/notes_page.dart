@@ -113,7 +113,10 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 12),
-            Text('Gagal memuat catatan:\n$message', textAlign: TextAlign.center),
+            Text(
+              'Gagal memuat catatan:\n$message',
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
