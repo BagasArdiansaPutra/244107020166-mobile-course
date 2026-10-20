@@ -60,10 +60,10 @@ Masalah yang ditemukan:
 
 | Kriteria | Target | Hasil | Bukti |
 |----------|--------|-------|-------|
-| Struktur feature-first terbukti | 3 grep sterilitas kosong | Lolos | `docs/../screenshots/12-sterility.png` |
-| `flutter analyze` bersih | 0 issue di week5, week6, week7 | Lolos | `screenshots/06-analyze-w5.png`, `09-analyze-w7.png` |
+| Struktur feature-first terbukti | 3 grep sterilitas kosong | Lolos | `screenshots/12-sterility.png` |
+| `flutter analyze` bersih | 0 issue di week5, week6, week7 | Lolos | `screenshots/06-analyze-w5.png`, `screenshots/09-analyze-w7.png`, `screenshots/15-analyze-w6.png` |
 | `dart format` rapi | 0 file berubah | Lolos | `screenshots/07-format-w5.png` |
-| `flutter test` hijau | semua test lulus | 8 + 19 + 24 = **51 test** | `screenshots/08-test-w5.png`, `10-test-w7.png` |
+| `flutter test` hijau | semua test lulus | 8 + 19 + 24 = **51 test** | `screenshots/08-test-w5.png`, `screenshots/16-test-w6.png`, `screenshots/10-test-w7.png` |
 | PR kecil + commit jelas | 1 fitur per PR, < 300 baris | 7 PR, PR fitur 198 baris | `docs/pr-notes-validation.md` |
 | Review ditindaklanjuti | semua komentar terjawab | 5 temuan sejawat + 5 temuan AI | `docs/peer-review-notes-validation.md`, `docs/ai-review-vs-keputusan.md` |
 | README + screenshot + cara menjalankan | lengkap | Lolos | `README.md` |
