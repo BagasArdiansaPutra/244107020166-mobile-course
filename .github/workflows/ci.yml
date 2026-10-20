@@ -15,6 +15,7 @@ jobs:
       matrix:
         project:
           - week5_local_storage_offline_first
+          - week6_authentication_security_fcm
           - week_7_clean_architecture
     defaults:
       run:
