@@ -22,9 +22,7 @@ class OfflineNotesApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Offline Notes',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: seed),
-      ),
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: seed)),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: seed,

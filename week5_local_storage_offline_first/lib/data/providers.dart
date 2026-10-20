@@ -23,8 +23,9 @@ final postRepositoryProvider = Provider<PostRepository>(
   (ref) => PostRepository(ref.watch(dioProvider)),
 );
 
-final darkModeProvider =
-    AsyncNotifierProvider<DarkModeNotifier, bool>(DarkModeNotifier.new);
+final darkModeProvider = AsyncNotifierProvider<DarkModeNotifier, bool>(
+  DarkModeNotifier.new,
+);
 
 class DarkModeNotifier extends AsyncNotifier<bool> {
   @override
@@ -44,8 +45,9 @@ final lastOpenedProvider = FutureProvider<String?>((ref) {
   return ref.watch(prefsRepositoryProvider).getLastOpened();
 });
 
-final forceOfflineProvider =
-    NotifierProvider<ForceOfflineNotifier, bool>(ForceOfflineNotifier.new);
+final forceOfflineProvider = NotifierProvider<ForceOfflineNotifier, bool>(
+  ForceOfflineNotifier.new,
+);
 
 class ForceOfflineNotifier extends Notifier<bool> {
   @override
@@ -56,8 +58,9 @@ class ForceOfflineNotifier extends Notifier<bool> {
   void toggle() => state = !state;
 }
 
-final notesProvider =
-    AsyncNotifierProvider<NotesNotifier, List<Note>>(NotesNotifier.new);
+final notesProvider = AsyncNotifierProvider<NotesNotifier, List<Note>>(
+  NotesNotifier.new,
+);
 
 class NotesNotifier extends AsyncNotifier<List<Note>> {
   @override
@@ -86,8 +89,9 @@ final noteByIdProvider = FutureProvider.family<Note?, int>((ref, id) {
   return ref.watch(noteRepositoryProvider).getNoteById(id);
 });
 
-final postsProvider =
-    AsyncNotifierProvider<PostsNotifier, List<Post>>(PostsNotifier.new);
+final postsProvider = AsyncNotifierProvider<PostsNotifier, List<Post>>(
+  PostsNotifier.new,
+);
 
 class PostsNotifier extends AsyncNotifier<List<Post>> {
   @override
