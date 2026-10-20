@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:_06_week_6_authentication_security_fcm/data/api_errors.dart';
-import 'package:_06_week_6_authentication_security_fcm/data/auth_repository.dart';
+import 'package:week6_authentication_security_fcm/data/api_errors.dart';
+import 'package:week6_authentication_security_fcm/data/auth_repository.dart';
 
 void main() {
   group('AuthRepository', () {
@@ -36,13 +36,13 @@ void main() {
 
   group('messageForError', () {
     DioException withStatus(int status) => DioException(
-          requestOptions: RequestOptions(path: '/pengumuman'),
-          type: DioExceptionType.badResponse,
-          response: Response(
-            requestOptions: RequestOptions(path: '/pengumuman'),
-            statusCode: status,
-          ),
-        );
+      requestOptions: RequestOptions(path: '/pengumuman'),
+      type: DioExceptionType.badResponse,
+      response: Response(
+        requestOptions: RequestOptions(path: '/pengumuman'),
+        statusCode: status,
+      ),
+    );
 
     test('401 menjadi pesan sesi berakhir', () {
       expect(messageForError(withStatus(401)), contains('Sesi berakhir'));

@@ -31,9 +31,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     final error = ref.read(authStateProvider).error;
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(messageForError(error))),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(messageForError(error))));
     }
   }
 

@@ -7,8 +7,9 @@ import '../data/token_store.dart';
 
 final tokenStoreProvider = Provider<TokenStore>((ref) => TokenStore());
 
-final authRepositoryProvider =
-    Provider<AuthRepository>((ref) => AuthRepository());
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => AuthRepository(),
+);
 
 final apiClientProvider = Provider<Dio>((ref) {
   return buildApiClient(
@@ -20,8 +21,9 @@ final apiClientProvider = Provider<Dio>((ref) {
 });
 
 /// Status login diturunkan dari ada/tidaknya access token tersimpan.
-final authStateProvider =
-    AsyncNotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
+final authStateProvider = AsyncNotifierProvider<AuthNotifier, bool>(
+  AuthNotifier.new,
+);
 
 class AuthNotifier extends AsyncNotifier<bool> {
   @override
