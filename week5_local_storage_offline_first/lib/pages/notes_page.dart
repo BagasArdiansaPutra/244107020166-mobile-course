@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/providers.dart';
+import 'widgets/add_note_dialog.dart';
 import 'widgets/note_tile.dart';
 
 class NotesPage extends ConsumerWidget {
@@ -125,33 +126,13 @@ class _ErrorView extends StatelessWidget {
 }
 
 Future<void> _promptAddNote(BuildContext context, WidgetRef ref) async {
-  final controller = TextEditingController();
   final title = await showDialog<String>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('Catatan baru'),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        decoration: const InputDecoration(hintText: 'Judul catatan'),
-        onSubmitted: (value) => Navigator.of(dialogContext).pop(value),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(),
-          child: const Text('Batal'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(dialogContext).pop(controller.text),
-          child: const Text('Simpan'),
-        ),
-      ],
-    ),
+    builder: (_) => const AddNoteDialog(),
   );
 
-  final trimmed = title?.trim() ?? '';
-  if (trimmed.isEmpty) return;
-  await ref.read(notesProvider.notifier).add(title: trimmed);
+  if (title == null) return;
+  await ref.read(notesProvider.notifier).add(title: title);
 }
 
 Future<void> _syncNow(BuildContext context, WidgetRef ref) async {

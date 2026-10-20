@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
+import '../../core/note_validation.dart';
 import '../local/db.dart';
 import '../local/note.dart';
 
@@ -23,9 +24,14 @@ class NoteRepository {
   }
 
   Future<Note> addNote({required String title, String body = ''}) async {
+    final error = validateNoteTitle(title);
+    if (error != null) {
+      throw ArgumentError(error);
+    }
+
     final db = await _openDb();
     final note = Note(
-      title: title,
+      title: title.trim(),
       body: body,
       updatedAt: DateTime.now(),
       dirty: true,
