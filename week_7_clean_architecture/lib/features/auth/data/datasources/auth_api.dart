@@ -30,7 +30,9 @@ class AuthApi {
   /// Refresh token mati berarti user harus login ulang.
   Future<String> refresh(String refreshToken) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    if (refreshToken.isEmpty) throw const NetworkFailure('Refresh token hilang');
+    if (refreshToken.isEmpty) {
+      throw const NetworkFailure('Refresh token hilang');
+    }
     return 'mock-access-renewed-${DateTime.now().millisecondsSinceEpoch}';
   }
 }

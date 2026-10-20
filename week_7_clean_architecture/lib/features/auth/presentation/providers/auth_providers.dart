@@ -30,8 +30,9 @@ final loginProvider = Provider<Login>((ref) {
 });
 
 /// Status login diturunkan dari ada/tidaknya access token tersimpan.
-final authStateProvider =
-    AsyncNotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
+final authStateProvider = AsyncNotifierProvider<AuthNotifier, bool>(
+  AuthNotifier.new,
+);
 
 class AuthNotifier extends AsyncNotifier<bool> {
   @override
@@ -43,10 +44,9 @@ class AuthNotifier extends AsyncNotifier<bool> {
   Future<void> login(String email, String password) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final result = await ref.read(loginProvider).call(
-            email: email,
-            password: password,
-          );
+      final result = await ref
+          .read(loginProvider)
+          .call(email: email, password: password);
       final failure = result.failure;
       if (failure != null) throw failure;
       return true;

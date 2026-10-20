@@ -1,25 +1,27 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:_07_week_7_clean_architecture/core/failures.dart';
-import 'package:_07_week_7_clean_architecture/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:_07_week_7_clean_architecture/infrastructure/network/api_error_mapper.dart';
+import 'package:week7_clean_architecture/core/failures.dart';
+import 'package:week7_clean_architecture/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:week7_clean_architecture/infrastructure/network/api_error_mapper.dart';
 
 void main() {
   group('AuthRepositoryImpl', () {
     final repo = AuthRepositoryImpl();
 
-    test('authenticate berhasil mengembalikan access dan refresh token',
-        () async {
-      final result = await repo.authenticate(
-        email: 'mahasiswa@kampus.ac.id',
-        password: 'rahasia123',
-      );
-      expect(result.failure, isNull);
-      expect(result.session, isNotNull);
-      expect(result.session!.access, isNotEmpty);
-      expect(result.session!.refresh, isNotEmpty);
-    });
+    test(
+      'authenticate berhasil mengembalikan access dan refresh token',
+      () async {
+        final result = await repo.authenticate(
+          email: 'mahasiswa@kampus.ac.id',
+          password: 'rahasia123',
+        );
+        expect(result.failure, isNull);
+        expect(result.session, isNotNull);
+        expect(result.session!.access, isNotEmpty);
+        expect(result.session!.refresh, isNotEmpty);
+      },
+    );
 
     test('authenticate gagal saat kredensial salah', () async {
       final result = await repo.authenticate(
@@ -45,13 +47,13 @@ void main() {
 
   group('messageForError', () {
     DioException withStatus(int status) => DioException(
-          requestOptions: RequestOptions(path: '/pengumuman'),
-          type: DioExceptionType.badResponse,
-          response: Response(
-            requestOptions: RequestOptions(path: '/pengumuman'),
-            statusCode: status,
-          ),
-        );
+      requestOptions: RequestOptions(path: '/pengumuman'),
+      type: DioExceptionType.badResponse,
+      response: Response(
+        requestOptions: RequestOptions(path: '/pengumuman'),
+        statusCode: status,
+      ),
+    );
 
     test('401 menjadi pesan sesi berakhir', () {
       expect(messageForError(withStatus(401)), contains('Sesi berakhir'));

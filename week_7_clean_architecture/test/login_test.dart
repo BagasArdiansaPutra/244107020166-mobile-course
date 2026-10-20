@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:_07_week_7_clean_architecture/core/failures.dart';
-import 'package:_07_week_7_clean_architecture/features/auth/domain/entities/auth_session.dart';
-import 'package:_07_week_7_clean_architecture/features/auth/domain/repositories/auth_repository.dart';
-import 'package:_07_week_7_clean_architecture/features/auth/domain/repositories/session_repository.dart';
-import 'package:_07_week_7_clean_architecture/features/auth/domain/usecases/login.dart';
+import 'package:week7_clean_architecture/core/failures.dart';
+import 'package:week7_clean_architecture/features/auth/domain/entities/auth_session.dart';
+import 'package:week7_clean_architecture/features/auth/domain/repositories/auth_repository.dart';
+import 'package:week7_clean_architecture/features/auth/domain/repositories/session_repository.dart';
+import 'package:week7_clean_architecture/features/auth/domain/usecases/login.dart';
 
 class _FakeAuthRepository implements AuthRepository {
   _FakeAuthRepository({this.fail = false});
@@ -54,10 +54,10 @@ void main() {
   test('Login menyimpan sesi saat autentikasi berhasil', () async {
     final session = _FakeSessionRepository();
 
-    final result = await Login(_FakeAuthRepository(), session).call(
-      email: 'mahasiswa@kampus.ac.id',
-      password: 'rahasia123',
-    );
+    final result = await Login(
+      _FakeAuthRepository(),
+      session,
+    ).call(email: 'mahasiswa@kampus.ac.id', password: 'rahasia123');
 
     expect(result.failure, isNull);
     expect(result.session, isNotNull);
@@ -67,10 +67,10 @@ void main() {
   test('Login tidak menyimpan sesi saat autentikasi gagal', () async {
     final session = _FakeSessionRepository();
 
-    final result = await Login(_FakeAuthRepository(fail: true), session).call(
-      email: 'salah@kampus.ac.id',
-      password: 'salah',
-    );
+    final result = await Login(
+      _FakeAuthRepository(fail: true),
+      session,
+    ).call(email: 'salah@kampus.ac.id', password: 'salah');
 
     expect(result.failure, isA<AuthFailure>());
     expect(result.session, isNull);

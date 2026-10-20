@@ -7,7 +7,7 @@ import '../entities/announcement.dart';
 /// layer data. Domain tidak tahu dari mana datanya berasal.
 abstract class AnnouncementRepository {
   Future<({List<Announcement> announcements, Failure? failure})>
-      fetchAnnouncements();
+  fetchAnnouncements();
 
   Future<({Announcement? announcement, Failure? failure})> fetchById(String id);
 }
