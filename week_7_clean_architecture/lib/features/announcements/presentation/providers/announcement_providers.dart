@@ -24,8 +24,10 @@ final announcementsProvider = FutureProvider<List<Announcement>>((ref) async {
 });
 
 /// State satu pengumuman berdasarkan id (untuk halaman detail & deep link).
-final announcementByIdProvider =
-    FutureProvider.family<Announcement, String>((ref, id) async {
+final announcementByIdProvider = FutureProvider.family<Announcement, String>((
+  ref,
+  id,
+) async {
   final result = await ref.watch(announcementRepositoryProvider).fetchById(id);
   if (result.failure != null) throw result.failure!;
   return result.announcement!;

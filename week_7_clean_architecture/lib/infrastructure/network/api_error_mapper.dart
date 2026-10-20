@@ -42,7 +42,9 @@ Failure failureForError(Object error) {
         return const NetworkFailure('Data tidak ditemukan.');
       }
       if (code != null && code >= 500) {
-        return const NetworkFailure('Server sedang bermasalah. Coba lagi nanti.');
+        return const NetworkFailure(
+          'Server sedang bermasalah. Coba lagi nanti.',
+        );
       }
       return NetworkFailure('Permintaan gagal (kode $code).');
     case DioExceptionType.unknown:

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:_07_week_7_clean_architecture/core/failures.dart';
-import 'package:_07_week_7_clean_architecture/features/announcements/domain/entities/announcement.dart';
-import 'package:_07_week_7_clean_architecture/features/announcements/domain/repositories/announcement_repository.dart';
-import 'package:_07_week_7_clean_architecture/features/announcements/domain/usecases/get_announcements.dart';
+import 'package:week7_clean_architecture/core/failures.dart';
+import 'package:week7_clean_architecture/features/announcements/domain/entities/announcement.dart';
+import 'package:week7_clean_architecture/features/announcements/domain/repositories/announcement_repository.dart';
+import 'package:week7_clean_architecture/features/announcements/domain/usecases/get_announcements.dart';
 
 /// Repository palsu: domain diuji murni tanpa jaringan atau database.
 class FakeAnnouncementRepository implements AnnouncementRepository {
@@ -14,7 +14,7 @@ class FakeAnnouncementRepository implements AnnouncementRepository {
 
   @override
   Future<({List<Announcement> announcements, Failure? failure})>
-      fetchAnnouncements() async {
+  fetchAnnouncements() async {
     if (fail) {
       return (
         announcements: const <Announcement>[],
@@ -35,9 +35,7 @@ class FakeAnnouncementRepository implements AnnouncementRepository {
 void main() {
   test('GetAnnouncements meneruskan daftar dari repository', () async {
     final repo = FakeAnnouncementRepository(
-      items: [
-        const Announcement(id: '1', title: 'A', body: ''),
-      ],
+      items: [const Announcement(id: '1', title: 'A', body: '')],
     );
 
     final result = await GetAnnouncements(repo).call();

@@ -45,8 +45,7 @@ class HomePage extends ConsumerWidget {
                       title: Text(item.title),
                       subtitle: Text(item.body),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () =>
-                          context.go(AppRoute.announcementOf(item.id)),
+                      onTap: () => context.go(AppRoute.announcementOf(item.id)),
                     ),
                   ),
               ],

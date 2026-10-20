@@ -10,7 +10,7 @@ import '../../domain/repositories/session_repository.dart';
 /// (secure storage) sengaja tidak diketahui domain.
 class SessionRepositoryImpl implements SessionRepository {
   SessionRepositoryImpl({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+    : _storage = storage ?? const FlutterSecureStorage();
 
   final FlutterSecureStorage _storage;
 

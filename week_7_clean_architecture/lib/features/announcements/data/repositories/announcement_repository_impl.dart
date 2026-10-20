@@ -30,7 +30,7 @@ class AnnouncementRepositoryImpl implements AnnouncementRepository {
 
   @override
   Future<({List<Announcement> announcements, Failure? failure})>
-      fetchAnnouncements() async {
+  fetchAnnouncements() async {
     return (announcements: _items, failure: null);
   }
 
