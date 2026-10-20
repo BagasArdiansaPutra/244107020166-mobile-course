@@ -1,0 +1,495 @@
+# Week 8 — Mid Project Review (Hygiene Branch, PR, dan Static Analysis)
+
+Laporan praktikum minggu 8 mata kuliah **Mobile Programming**.
+Fokus jobsheet ini bukan menambah fitur, melainkan membuktikan bahwa fondasi
+project Minggu 5–7 bisa dipercaya: branch rapi, commit jelas, PR kecil, review
+ditindaklanjuti, dan tiga pemeriksaan mesin hijau.
+
+| | |
+|---|---|
+| Nama | Bagas Ardiansa Putra |
+| NIM | 244107020166 |
+| Kelas | TI-3D |
+| Repository | https://github.com/BagasArdiansaPutra/244107020166-mobile-course |
+| Branch utama kerja | `develop` (bukan `main`) |
+| Folder laporan | `08-week-8-mid-project-review/` |
+| Versi Flutter | 3.47.2 (stable) / Dart 3.13.2 |
+
+---
+
+## 1. Status paruh semester
+
+**Status: SIAP mid review.** Aplikasi berjalan identik dengan akhir Minggu 7;
+satu-satunya perubahan perilaku adalah validasi judul catatan (PR fitur Minggu 8).
+
+| Pemeriksaan | week5 | week6 | week7 |
+|---|---|---|---|
+| `flutter analyze` | No issues found! | No issues found! | No issues found! |
+| `dart format --set-exit-if-changed .` | 0 changed | 0 changed | 0 changed |
+| `flutter test` | **8** lulus | **19** lulus | **24** lulus |
+
+Total **51 test hijau**, 0 issue analyzer di tiga project portfolio.
+
+Bukti: [`screenshots/06-analyze-w5.png`](screenshots/06-analyze-w5.png),
+[`07-format-w5.png`](screenshots/07-format-w5.png),
+[`08-test-w5.png`](screenshots/08-test-w5.png),
+[`09-analyze-w7.png`](screenshots/09-analyze-w7.png),
+[`10-test-w7.png`](screenshots/10-test-w7.png),
+[`15-analyze-w6.png`](screenshots/15-analyze-w6.png),
+[`16-test-w6.png`](screenshots/16-test-w6.png).
+
+---
+
+## 2. Fitur utama portfolio
+
+| Minggu | Project | Fitur yang dibuktikan |
+|---|---|---|
+| 1 | `week1-mobile-development-ecosystem-flutter-refresh` | Profil mahasiswa dengan widget tree dasar |
+| 2 | `week2_responsive_dashboard` | Layout responsif (breakpoint) |
+| 3 | `week3_navigation`, `week3_todo` | Navigasi `go_router` + state todo |
+| 4 | `week4_api` | Konsumsi REST API, pagination, detail |
+| 5 | `week5_local_storage_offline_first` | CRUD catatan SQLite, `dirty flag`, sync, cache-first posts, preferensi `shared_preferences` |
+| 6 | `week6_authentication_security_fcm` | Login + token aman, refresh 401 sekali, deep link, FCM (foreground/background/terminated) |
+| 7 | `week_7_clean_architecture` | Refactor feature-first (`presentation → domain ← data`), use case + repository palsu |
+| 8 | *(PR #4)* | Validasi judul catatan kosong di core + UI + repository, dengan 8 test |
+
+Screenshot aplikasi dari praktikum sebelumnya:
+
+| Catatan offline-first (week5) | Notifikasi FCM (week6) |
+|---|---|
+| ![Catatan sebelum sync](screenshots/app-week5-notes.png) | ![Notifikasi masuk](screenshots/app-week6-fcm.png) |
+
+---
+
+## 3. Stack teknologi
+
+- Flutter 3.47.2 / Dart 3.13.2, Material 3
+- **flutter_riverpod** 3 — state management & DI
+- **go_router** 18 — navigasi deklaratif + deep link
+- **sqflite** — database lokal (catatan)
+- **shared_preferences** — preferensi (tema, mode offline)
+- **dio** 5 — HTTP client
+- **flutter_secure_storage** — penyimpanan token
+- **firebase_messaging** + **flutter_local_notifications** — push notification
+- **flutter_test** — unit, provider, dan widget test
+- **GitHub Actions** — CI (`flutter analyze` + format + `flutter test`)
+
+---
+
+## 4. Cara menjalankan
+
+### Prasyarat
+
+```bash
+flutter --version   # 3.47.2 stable
+git --version       # 2.46+
+```
+
+### Menjalankan aplikasi
+
+```bash
+git clone https://github.com/BagasArdiansaPutra/244107020166-mobile-course.git
+cd 244107020166-mobile-course
+git checkout develop
+
+cd week5_local_storage_offline_first
+flutter pub get
+flutter run
+
+# project lain
+cd ../week6_authentication_security_fcm && flutter pub get && flutter run
+cd ../week_7_clean_architecture        && flutter pub get && flutter run
+```
+
+### Menjalankan tiga pemeriksaan mesin (wajib sebelum minta review)
+
+```bash
+# ulangi di setiap folder project
+flutter analyze
+dart format --output=none --set-exit-if-changed .
+flutter test
+```
+
+Semua perintah di atas keluar dengan kode `0` pada `develop`.
+
+### Melihat laporan ini
+
+```bash
+cd 08-week-8-mid-project-review
+start README.md          # Windows
+```
+
+---
+
+## 5. Praktikum 1 — Hygiene branch dan commit
+
+### 5.1 Audit riwayat
+
+![Audit riwayat](screenshots/01-audit.png)
+
+```
+$ git log --oneline -15
+80db0b8 feat: initialize Flutter project with clean architecture structure and features
+939f5fd rename folder
+be47159 feat: add local storage offline-first and authentication security FCM course modules
+a253a84 commit tugas
+765edc3 commit tugas
+0ccf97e feat: create week 1 flutter profile app
+
+$ git branch -a
+* main
+  remotes/origin/main
+
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+nothing to commit, working tree clean
+```
+
+Masalah yang ditandai:
+
+| # | Temuan | Bukti |
+|---|---|---|
+| 1 | **Semua commit langsung ke `main`**, tidak ada `develop`/branch fitur | `git branch -a` hanya `main` |
+| 2 | **Pesan tidak informatif** `commit tugas` (2×) | `765edc3`, `a253a84` |
+| 3 | Commit rename tanpa konteks: `rename folder` | `939f5fd` (0 insert/delete) |
+| 4 | Satu commit mencampur 160 file / 7.530 baris | `80db0b8` |
+| 5 | `main` berumur > 1 bulan tanpa branch pendek (2026-09-08 → 2026-10-11) | tanggal commit |
+| 6 | File sensitif ikut ter-commit: `android/app/google-services.json` | `git ls-files` |
+| 7 | Tidak ada file untracked kotor (`.gitignore` per project sudah benar) | `git status` bersih |
+
+### 5.2 Membuat `develop` (sekali dari `main`)
+
+![Branch develop](screenshots/02-develop.png)
+
+```bash
+git checkout -b develop
+git push -u origin develop
+```
+
+Setelah ini `main` tidak disentuh lagi; seluruh pekerjaan masuk lewat `develop`.
+
+### 5.3 Branch kerja yang benar
+
+![Branch kerja](screenshots/03-feature-branch.png)
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feat/notes-validation
+git branch --show-current      # feat/notes-validation
+```
+
+### 5.4 Satu commit = satu perubahan logis (`git add -p`)
+
+Perubahan disentuh di 7 file, tetapi di-stage per hunk agar commit hanya memuat
+satu perubahan logis (validasi judul), bukan semua file yang tersentuh.
+
+![git add -p](screenshots/04-add-p.png)
+
+```bash
+git add -p
+# hunk import + guard repository  -> y
+# hunk dialog AddNoteDialog       -> y
+git commit -m "feat(notes): validasi judul kosong + test"
+git push -u origin feat/notes-validation
+```
+
+![Commit dan push](screenshots/05-commit-push.png)
+
+```
+[feat/notes-validation 719f645] feat(notes): validasi judul kosong + test
+ 5 files changed, 97 insertions(+), 22 deletions(-)
+```
+
+### 5.5 Perbaikan pesan commit lama (simulasi)
+
+Tabel sebelum → sesudah lengkap ada di
+**[`docs/review-checklist.md`](docs/review-checklist.md)**. Ringkasnya:
+
+| Commit | Sebelum | Sesudah | Alasan |
+|---|---|---|---|
+| `765edc3` | `commit tugas` | `feat(week2): tambah responsive dashboard dan isi identitas mahasiswa` | Diff-nya folder dashboard baru + ganti nama/NIM/email; tipe `feat` + scope `week2` menyebut apa & di mana |
+| `a253a84` | `commit tugas` | `docs(week3): ganti identitas README week3 ke Bagas Ardiansa Putra` | Hanya 3 baris README, bukan kode → `docs` |
+| `939f5fd` | `rename folder` | `refactor(repo): samakan penamaan folder week1-week3` | Rename murni (0 insert/delete) → `refactor`, reviewer tahu tidak perlu uji fungsional |
+| `80db0b8` | `feat: initialize Flutter project with clean architecture structure and features` | `feat(week7): import project clean architecture hasil refactor` | 160 file; kata "import" jujur menyatakan ini pemindahan, bukan fitur baru |
+| `be47159` | `feat: add local storage offline-first and authentication security FCM course modules` | `feat(week5,week6): tambah modul offline-first dan auth+FCM` | Dua modul dalam satu commit; bila tak bisa dipecah, scope ganda membuatnya jujur |
+
+---
+
+## 6. Praktikum 2 — PR dan peer review
+
+### 6.1 PR kecil
+
+Body PR lengkap: **[`docs/pr-notes-validation.md`](docs/pr-notes-validation.md)**.
+
+```text
+Judul : feat(notes): validasi judul kosong + test
+Masalah: pengguna bisa menyimpan catatan tanpa judul.
+Solusi : validasi di core/note_validation.dart + guard di NoteRepository
+         + pesan error di AddNoteDialog.
+Cara uji: 1) tambah catatan kosong -> error muncul.
+          2) flutter test test/validate_note_test.dart
+Closes #4
+```
+
+Ukuran PR: **7 file, +198 / −24 baris** — di bawah batas 300 baris sehingga bisa
+direview < 15 menit.
+
+### 6.2 Review sejawat 15 menit
+
+Catatan lengkap: **[`docs/peer-review-notes-validation.md`](docs/peer-review-notes-validation.md)**.
+
+Keputusan putaran 1: **Request changes** (2 blocker + 1 arsitektur + 1 test).
+Keputusan putaran 2: **Approve**.
+
+| ID | Kategori | Temuan | Keputusan |
+|---|---|---|---|
+| R1 | Kebenaran (state) | `errorText` tidak pernah di-reset setelah pengguna mengetik; pesan error "menempel" | Diterima → `onChanged` reset + test |
+| R2 | Kebenaran (privasi) | `ArgumentError.value(title, ...)` mencetak isi catatan ke `toString()` → bocor ke log/crash report | Diterima → `throw ArgumentError(error)` + test anti-bocor |
+| R3 | Arsitektur | Validasi terkunci di UI, `TextEditingController` tanpa pemilik sehingga tidak pernah di-`dispose()` | Diterima → `core/note_validation.dart` + `AddNoteDialog` StatefulWidget |
+| R4 | Test | Hanya jalur sukses; tidak ada bukti UI menampilkan error / repository menolak sebelum buka DB | Diterima → 8 test |
+| R5 | Keterbacaan | Pesan error hard-coded di produksi & test | **Ditolak** dengan alasan tertulis (test sengaja mengunci teks) |
+
+Contoh komentar yang bisa ditindaklanjuti (pola observasi → dampak → usulan):
+
+> **R3 — Arsitektur.** `_promptAddNote` ~45 baris dengan tiga tanggung jawab
+> (controller, validasi, dialog) di dalam `StatefulBuilder`; controller tidak
+> pernah di-`dispose()`.
+> **Dampak:** controller bocor tiap dialog dibuka, dan aturan bisnis terkunci di
+> layer UI sehingga jalur sync/import bisa melewatinya.
+> **Usul:** pindahkan aturan ke `core/note_validation.dart`, dialog ke
+> `AddNoteDialog` (StatefulWidget), dan panggil validator yang sama di
+> `NoteRepository.addNote`.
+> **Alasan:** satu sumber aturan, UI tipis, dan bisa diunit-test tanpa widget.
+
+### 6.3 Tindak lanjut dan merge
+
+Perbaikan dikerjakan di commit `2ff9393` pada branch yang sama, lalu
+di-squash ke `develop` sebagai `a3acf31 feat(notes): validasi judul kosong + test (#4)`
+agar commit perantara tidak mengotori riwayat.
+
+### 6.4 Peta issue → PR
+
+| Issue | Judul | Branch | PR | Status |
+|---|---|---|---|---|
+| #1 | Rapikan nama package + format week5 agar analyze bersih | `chore/week5-hygiene` | PR #1 | Merged (`9623a4a`) |
+| #2 | Rapikan package + lint week7 | `chore/week7-hygiene` | PR #2 | Merged (`0e3c1fa`) |
+| #3 | CI: analyze + format + test pada PR | `chore/ci` | PR #3 | Merged (`6d4e684`) |
+| #4 | Validasi judul catatan kosong + test | `feat/notes-validation` | PR #4 | Merged (`a3acf31`) |
+| #5 | Rapikan package week6 (analyze bersih) | `chore/week6-hygiene` | PR #5 | Merged (`15c03df`) |
+| #6 | CI: sertakan week6 dalam matrix | `chore/ci-week6` | PR #6 | Merged (`368ec52`) |
+| #7 | Laporan mid review + checklist + AI review | `docs/week8-mid-review` | PR #7 | Open — untuk review sejawat |
+
+Riwayat integrasi:
+
+![Riwayat branch](screenshots/13-graph.png)
+
+---
+
+## 7. Praktikum 3 — Static analysis dan mid review
+
+### 7.1 Tiga perintah mesin
+
+| Project | `flutter analyze` | `dart format` | `flutter test` |
+|---|---|---|---|
+| week5 | ![analyze](screenshots/06-analyze-w5.png) | ![format](screenshots/07-format-w5.png) | ![test](screenshots/08-test-w5.png) |
+| week6 | ![analyze](screenshots/15-analyze-w6.png) | (sama, 0 changed) | ![test](screenshots/16-test-w6.png) |
+| week7 | ![analyze](screenshots/09-analyze-w7.png) | (sama, 0 changed) | ![test](screenshots/10-test-w7.png) |
+
+Temuan nyata yang diperbaiki pada tahap ini:
+
+| Gejala analyzer | Lokasi | Perbaikan |
+|---|---|---|
+| `package_names` (info) | `week5`, `week6`, `week7` — nama package diawali `_0X_` | Ganti ke `week5_local_storage_offline_first`, `week6_authentication_security_fcm`, `week7_clean_architecture` + sesuaikan import test |
+| `curly_braces_in_flow_control_structures` (info) | `week7/lib/features/auth/data/datasources/auth_api.dart:34` | Bungkus `throw` dengan `{ }` |
+| `dart format` 29 file berubah (repo-wide) | `week3_todo`, `week4_api`, `week6`, `week7` | Format per project, bukan seluruh repo, agar PR tetap kecil |
+
+### 7.2 CI menolak PR kotor
+
+![CI](screenshots/11-ci.png)
+
+`.github/workflows/ci.yml` berjalan pada setiap `pull_request` ke `develop`/`main`
+dengan matrix tiga project. Langkahnya: `flutter pub get` → `flutter analyze` →
+`dart format --output=none --set-exit-if-changed .` → `flutter test`.
+
+### 7.3 Nilai kesiapan tengah semester
+
+Checklist lengkap: **[`docs/review-checklist.md`](docs/review-checklist.md)**.
+
+| Kriteria | Hasil |
+|---|---|
+| Struktur feature-first terbukti (3 grep sterilitas) | Kosong semua → lolos |
+| `flutter analyze` bersih | 0 issue (3 project) |
+| `flutter test` hijau | 51 test |
+| PR kecil + commit jelas | 7 PR, PR fitur 198 baris |
+| README + screenshot + cara menjalankan | Dokumen ini |
+| Semua komentar review ditindaklanjuti | 5 temuan sejawat, 5 temuan AI (2 diterima, 3 ditolak beralasan) |
+
+Uji sterilitas dependency rule (diulang di Minggu 8):
+
+![Sterilitas](screenshots/12-sterility.png)
+
+```bash
+grep -RInE "^import .*features/[a-z_]+/data" lib/features/*/presentation   # kosong
+grep -RInE "^import .*package:(flutter|dio|sqflite)" lib/features/*/domain # kosong
+grep -RInE "^import .*presentation" lib/features/*/data                    # kosong
+```
+
+---
+
+## 8. AI Challenge
+
+Prompt yang dipakai:
+
+```text
+Review PR Flutter ini sebagai senior Flutter dev.
+Konteks: feature-first Clean Architecture (presentation -> domain <- data),
+Riverpod, GoRouter, SQLite + Dio.
+Fokus: kebenaran, arsitektur, dan test. Abaikan style.
+Berikan 5 temuan teratas + level (blocker/saran)
++ alasan + usulan potongan kode perbaikan.
+```
+
+Dokumentasi lengkap: **[`docs/ai-review-vs-keputusan.md`](docs/ai-review-vs-keputusan.md)**.
+
+| ID | Temuan AI | Level | Keputusan | Bukti |
+|---|---|---|---|---|
+| A1 | Validasi hanya di UI, repository masih menerima judul kosong | blocker | **Diterima** | `git show 6d4e684:.../note_repository.dart \| grep validate` → kosong; sekarang baris 27 |
+| A2 | `TextEditingController` tidak pernah di-`dispose()` | blocker | **Diterima** | `git show 6d4e684:.../notes_page.dart \| grep dispose` → kosong |
+| A3 | Ganti `ArgumentError` dengan `Either<Failure, Note>` | blocker | **Ditolak** | Week5 bukan clean architecture; judul kosong bukan kegagalan domain |
+| A4 | Pakai `Form` + `GlobalKey<FormState>` | saran | **Ditolak** | Tidak mengubah perilaku, menambah state global |
+| A5 | Pindahkan validasi ke provider Riverpod | saran | **Ditolak** | `validateNoteTitle` fungsi murni; membungkusnya memperberat test |
+
+![Bukti temuan AI](screenshots/14-ai-proof.png)
+
+Dua temuan AI terbukti benar dengan bukti grep, satu di antaranya (A2) adalah bug
+berupa *absence* yang tidak terlihat dari diff biasa. Tiga saran ditolak karena
+melanggar konteks arsitektur atau hanya menambah kode tanpa menghilangkan bug.
+
+---
+
+## 9. Refactoring, testing, dan error umum
+
+### Ukuran PR (semua < 300 baris)
+
+| PR | File | Baris |
+|---|---|---|
+| #1 week5 hygiene | 16 | +58 / −70 |
+| #2 week7 hygiene | 18 | +117 / −107 |
+| #3 CI | 1 | +35 |
+| #4 validasi judul | 7 | +198 / −24 |
+| #5 week6 hygiene | 10 | +72 / −64 |
+| #6 CI week6 | 1 | +1 |
+
+### Review tanpa dijalankan tidak sah
+
+Setiap PR yang mengubah perilaku menyertakan bukti:
+
+```bash
+flutter analyze
+dart format --output=none --set-exit-if-changed .
+flutter test
+# + langkah manual: buka app, tekan +, Simpan dengan field kosong, lihat error
+```
+
+### Error umum yang ditemui
+
+| Gejala | Penyebab | Solusi yang dipakai |
+|---|---|---|
+| `package_names` info | Nama package `_05_...` diawali underscore | Rename package + import test, bukan `// ignore` |
+| `dart format` mengubah 29 file sekaligus | Format dijalankan dari root repo (semua project) | Jalankan per project; PR tetap kecil |
+| Push ditolak setelah `git rebase develop` | Riwayat branch ditulis ulang | `git push --force-with-lease` pada branch fitur (bukan `develop`) |
+| Konflik saat rebase `feat/notes-validation` | Hygiene branch mengubah file yang sama (`note_repository.dart`) | Selesaikan konflik manual, `git add`, `git rebase --continue` |
+| `gh` tidak tersedia | CLI GitHub tidak terpasang di mesin praktikum | Merge lokal bergaya PR + body PR disimpan di `docs/` |
+
+---
+
+## 10. Checklist verifikasi mandiri
+
+- [x] Branch dari `develop`; `main` tidak disentuh setelah `develop` dibuat.
+- [x] PR kecil satu fitur (198 baris), issue tertutup via PR (`Closes #4`).
+- [x] Minimal 3 komentar review bermakna ditindaklanjuti hingga approve (R1–R4 + R5 ditolak beralasan).
+- [x] `flutter analyze` bersih di week5, week6, week7.
+- [x] `dart format` rapi (0 file berubah).
+- [x] `flutter test` hijau (8 + 19 + 24 = 51).
+- [x] Tabel usulan AI vs keputusan final terdokumentasi di `docs/`.
+- [x] README memuat status paruh semester, peta issue/PR, fitur, stack, cara menjalankan, dan screenshot.
+
+---
+
+## 11. Refleksi
+
+**1. Apa beda LGTM buta dengan approve yang bertanggung jawab? Apa risikonya bagi tim?**
+
+LGTM buta adalah "saya percaya penulisnya"; approve bertanggung jawab adalah
+"saya sudah checkout branch ini, menjalankan test, dan bisa menjelaskan setiap
+perubahan". Pada PR ini LGTM buta akan meloloskan dua bug yang benar-benar ada:
+pesan error yang tidak pernah hilang (R1) dan isi catatan yang tercetak di
+exception (R2) — keduanya tidak terlihat dari membaca diff sekilas, hanya
+ketahuan saat widget dijalankan. Risikonya bagi tim bukan cuma bug: review
+menjadi ritual, sehingga anggota tim berhenti membaca PR dan satu orang menjadi
+satu-satunya penjaga kualitas. Ketika orang itu sibuk, seluruh tim buta.
+
+**2. Kapan komentar wajib `request changes`, dan kapan cukup saran?**
+
+`request changes` bila ada **bug yang bisa direproduksi**, **kebocoran data**,
+atau **pelanggaran arsitektur yang menular** (mis. domain mengimpor Flutter).
+R1, R2, R3 masuk kategori ini karena masing-masing punya dampak yang bisa
+ditunjukkan. Cukup saran bila perubahan bersifat preferensi atau baru berguna
+pada skala lain — mis. R5 (konstanta pesan error) dan A4/A5 dari AI: tidak ada
+bug yang hilang bila tidak dikerjakan, sehingga tidak pantas menahan merge.
+
+**3. Bagian mana dari review AI yang saya tolak atau sederhanakan, dan mengapa?**
+
+Saya menolak A3 (`Either<Failure, Note>`), A4 (`Form` + `GlobalKey`), dan A5
+(validasi di provider). A3 mengimpor pola dari week7 ke project yang memang
+belum clean architecture, dan salah kategori: judul kosong adalah pelanggaran
+kontrak pemanggil, bukan kegagalan domain. A4 dan A5 "lebih idiomatik" tetapi
+tidak menghilangkan satu bug pun, sementara menambah state yang harus dikelola
+dan membuat test lebih berat. Yang saya sederhanakan: A1 saya terapkan sebagai
+guard 5 baris di repository, bukan sebagai layer validasi baru.
+
+**4. Satu hal konkret yang saya perbaiki setelah review sejawat — apa dampaknya?**
+
+Memindahkan dialog ke `AddNoteDialog` (StatefulWidget) sehingga
+`TextEditingController` punya pemilik dan di-`dispose()`. Dampak langsung: tidak
+ada lagi controller yang bocor setiap dialog dibuka, `notes_page.dart` turun dari
+179 → 152 baris, dan dialog menjadi satu-satunya tempat yang bisa dites — dari 0
+menjadi 3 widget test (error muncul, error hilang saat mengetik, judul ter-trim).
+Efek sampingnya positif: karena validasi dipindah ke fungsi murni
+`validateNoteTitle`, aturan yang sama sekarang dipakai UI **dan** repository,
+sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
+
+---
+
+## 12. Struktur folder laporan
+
+```
+08-week-8-mid-project-review/
+├── README.md                          # laporan ini
+├── docs/
+│   ├── review-checklist.md            # tabel sebelum/sesudah commit + kesiapan mid review
+│   ├── pr-notes-validation.md         # body PR (masalah, solusi, cara uji, hasil mesin)
+│   ├── peer-review-notes-validation.md# 5 temuan reviewer + keputusan
+│   └── ai-review-vs-keputusan.md      # prompt, output AI, tabel usulan vs keputusan, bukti
+└── screenshots/
+    ├── 01-audit.png                   # git log / branch / status
+    ├── 02-develop.png                 # pembuatan branch develop
+    ├── 03-feature-branch.png          # branch kerja feat/notes-validation
+    ├── 04-add-p.png                   # git add -p per hunk
+    ├── 05-commit-push.png             # commit konvensional + push
+    ├── 06-analyze-w5.png              # flutter analyze week5
+    ├── 07-format-w5.png               # dart format week5
+    ├── 08-test-w5.png                 # flutter test week5
+    ├── 09-analyze-w7.png              # flutter analyze week7
+    ├── 10-test-w7.png                 # flutter test week7
+    ├── 11-ci.png                      # workflow CI
+    ├── 12-sterility.png               # uji sterilitas dependency rule
+    ├── 13-graph.png                   # riwayat branch & merge
+    ├── 14-ai-proof.png                # bukti temuan AI (sebelum vs sesudah)
+    ├── 15-analyze-w6.png              # flutter analyze week6
+    ├── 16-test-w6.png                 # flutter test week6
+    ├── app-week5-notes.png            # screenshot aplikasi week5
+    └── app-week6-fcm.png              # screenshot aplikasi week6
+```
