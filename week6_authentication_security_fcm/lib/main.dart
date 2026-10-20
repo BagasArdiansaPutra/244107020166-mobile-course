@@ -17,12 +17,7 @@ Future<void> main() async {
   final container = ProviderContainer();
   final router = container.read(routerProvider);
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const MyApp(),
-    ),
-  );
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 
   // Deep link dari notifikasi butuh router yang sudah terpasang, jadi dipasang
   // setelah frame pertama; handleTerminated mengambil pesan pembuka aplikasi.

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:_06_week_6_authentication_security_fcm/routes.dart';
+import 'package:week6_authentication_security_fcm/routes.dart';
 
 void main() {
   group('routeFromMessage', () {
@@ -26,7 +26,10 @@ void main() {
     });
 
     test('id dipakai saat route ada tapi tidak valid', () {
-      expect(routeFromMessage({'route': 'bukan-path', 'id': 7}), '/pengumuman/7');
+      expect(
+        routeFromMessage({'route': 'bukan-path', 'id': 7}),
+        '/pengumuman/7',
+      );
     });
   });
 

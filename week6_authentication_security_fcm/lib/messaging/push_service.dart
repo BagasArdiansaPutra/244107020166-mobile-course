@@ -72,7 +72,8 @@ Future<void> initLocalNotifications() async {
   // di sini dengan Importance.high agar banner heads-up muncul.
   await _local
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin
+      >()
       ?.createNotificationChannel(
         const AndroidNotificationChannel(
           _channelId,
@@ -95,9 +96,9 @@ Future<void> initFcmToken({
   try {
     // getToken bisa menggantung kalau layanan Firebase Installations tidak
     // terjangkau, jadi dibatasi timeout agar listener di bawah tetap terpasang.
-    final token = await FirebaseMessaging.instance
-        .getToken()
-        .timeout(const Duration(seconds: 10));
+    final token = await FirebaseMessaging.instance.getToken().timeout(
+      const Duration(seconds: 10),
+    );
     if (token != null) await onToken(token);
   } catch (_) {
     // Lewati token saat ini; onTokenRefresh di bawah akan menangkap token
