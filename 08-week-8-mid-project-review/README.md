@@ -168,6 +168,8 @@ git push -u origin develop
 ```
 
 Setelah ini `main` tidak disentuh lagi; seluruh pekerjaan masuk lewat `develop`.
+`develop` dijadikan **base/default target** setiap PR (PR #1–#7 di bawah semuanya
+`<branch> → develop`), sehingga `main` hanya menerima hasil yang sudah lolos CI.
 
 ### 5.3 Branch kerja yang benar
 
@@ -214,6 +216,14 @@ Tabel sebelum → sesudah lengkap ada di
 | `939f5fd` | `rename folder` | `refactor(repo): samakan penamaan folder week1-week3` | Rename murni (0 insert/delete) → `refactor`, reviewer tahu tidak perlu uji fungsional |
 | `80db0b8` | `feat: initialize Flutter project with clean architecture structure and features` | `feat(week7): import project clean architecture hasil refactor` | 160 file; kata "import" jujur menyatakan ini pemindahan, bukan fitur baru |
 | `be47159` | `feat: add local storage offline-first and authentication security FCM course modules` | `feat(week5,week6): tambah modul offline-first dan auth+FCM` | Dua modul dalam satu commit; bila tak bisa dipecah, scope ganda membuatnya jujur |
+
+### 5.6 Bukti per langkah jobsheet
+
+| Langkah jobsheet | Yang dikerjakan | Bukti |
+|---|---|---|
+| 1. Audit riwayat (`git log -15`, `git branch -a`, `git status`) | Menandai 7 masalah: commit langsung ke `main`, pesan `commit tugas`, `rename folder`, commit 160 file, `main` berumur > 1 bulan, `google-services.json` ter-commit, working tree bersih | `screenshots/01-audit.png`, tabel 5.1 |
+| 2. Branch kerja (`develop` → `feat/notes-validation`) | `develop` dibuat sekali dari `main` lalu di-push; branch fitur dari `develop`; satu commit logis via `git add -p` | `screenshots/02-develop.png`, `03-feature-branch.png`, `04-add-p.png`, `05-commit-push.png` |
+| 3. Perbaiki commit buruk (simulasi) | Tabel sebelum/sesudah 5 commit lama + aturan konvensional baru | [`docs/review-checklist.md`](docs/review-checklist.md), ringkasan 5.5 |
 
 ---
 
