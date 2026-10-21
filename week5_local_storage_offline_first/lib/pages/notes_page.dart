@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/local/note.dart';
 import '../data/providers.dart';
 import 'widgets/add_note_dialog.dart';
 import 'widgets/note_tile.dart';
+import 'widgets/notes_empty_state.dart';
+import 'widgets/notes_search_field.dart';
 
 class NotesPage extends ConsumerWidget {
   const NotesPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notesAsync = ref.watch(notesProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Catatan'),
@@ -35,30 +36,83 @@ class NotesPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: notesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _ErrorView(message: '$error'),
-        data: (notes) => notes.isEmpty
-            ? const _EmptyView()
-            : ListView.separated(
-                itemCount: notes.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final note = notes[index];
-                  return NoteTile(
-                    note: note,
-                    onTap: () => context.push('/note/${note.id}'),
-                    onDelete: () =>
-                        ref.read(notesProvider.notifier).remove(note.id!),
-                  );
-                },
-              ),
-      ),
+      body: const _NotesBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _promptAddNote(context, ref),
         tooltip: 'Tambah catatan',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+/// Memilih antara keadaan kosong, galat, atau daftar yang bisa dicari.
+class _NotesBody extends ConsumerWidget {
+  const _NotesBody();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(notesProvider)
+        .when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => _ErrorView(message: '$error'),
+          data: (notes) =>
+              notes.isEmpty ? const _EmptyView() : const _SearchableNotes(),
+        );
+  }
+}
+
+/// Kolom pencarian + hasil saring. Tidak menyentuh database.
+class _SearchableNotes extends ConsumerWidget {
+  const _SearchableNotes();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final visibleAsync = ref.watch(visibleNotesProvider);
+    final query = ref.watch(noteQueryProvider);
+
+    return Column(
+      children: [
+        NotesSearchField(
+          query: query,
+          onChanged: ref.read(noteQueryProvider.notifier).set,
+        ),
+        Expanded(
+          child: visibleAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => _ErrorView(message: '$error'),
+            data: (visible) => visible.isEmpty
+                ? NotesEmptyState(
+                    query: query,
+                    onClear: ref.read(noteQueryProvider.notifier).clear,
+                  )
+                : _NotesList(notes: visible),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NotesList extends ConsumerWidget {
+  const _NotesList({required this.notes});
+
+  final List<Note> notes;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListView.separated(
+      itemCount: notes.length,
+      separatorBuilder: (_, _) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final note = notes[index];
+        return NoteTile(
+          note: note,
+          onTap: () => context.push('/note/${note.id}'),
+          onDelete: () => ref.read(notesProvider.notifier).remove(note.id!),
+        );
+      },
     );
   }
 }
@@ -140,7 +194,7 @@ Future<void> _syncNow(BuildContext context, WidgetRef ref) async {
 
   if (ref.read(forceOfflineProvider)) {
     messenger.showSnackBar(
-      const SnackBar(content: Text('Mode offline aktif — sync dilewati.')),
+      const SnackBar(content: Text('Mode offline aktif - sync dilewati.')),
     );
     return;
   }

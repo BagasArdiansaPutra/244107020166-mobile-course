@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/note_search.dart';
 import 'api_client.dart';
 import 'local/note.dart';
 import 'models/post.dart';
@@ -83,6 +84,25 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
 
 final dirtyCountProvider = FutureProvider<int>((ref) {
   return ref.watch(noteRepositoryProvider).countDirty();
+});
+
+final noteQueryProvider = NotifierProvider<NoteQueryNotifier, String>(
+  NoteQueryNotifier.new,
+);
+
+class NoteQueryNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void set(String value) => state = value;
+
+  void clear() => state = '';
+}
+
+final visibleNotesProvider = Provider<AsyncValue<List<Note>>>((ref) {
+  final notes = ref.watch(notesProvider);
+  final query = ref.watch(noteQueryProvider);
+  return notes.whenData((list) => filterNotes(list, query));
 });
 
 final noteByIdProvider = FutureProvider.family<Note?, int>((ref, id) {
