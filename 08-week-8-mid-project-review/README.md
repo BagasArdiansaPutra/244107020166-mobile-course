@@ -344,6 +344,12 @@ Riwayat integrasi:
 
 ![Riwayat branch](screenshots/13-graph.png)
 
+Alur akhir: PR #1–#6 masuk ke `develop`, lalu `develop` di-*fast-forward* ke
+`main` bersama PR #7. Jadi `main` tidak pernah menerima commit langsung — hanya
+menerima riwayat yang sudah lolos review, dan setiap branch fitur dihapus setelah
+merge (`git ls-remote --heads origin` hanya menyisakan `main` + tiga branch
+`chore/*` lama dari Minggu 5–7).
+
 ---
 
 ## 7. Praktikum 3 — Static analysis dan mid review
