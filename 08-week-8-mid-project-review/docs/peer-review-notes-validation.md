@@ -52,11 +52,11 @@ memastikan `error.toString()` tidak memuat isi judul).
 
 ## R3 — Arsitektur: validasi + dialog menumpuk di presentation, controller bocor
 
-> **Observasi.** `_promptAddNote` menjadi ~45 baris berisi tiga tanggung jawab
-> sekaligus: membuat `TextEditingController`, memvalidasi, dan membangun
-> `AlertDialog` di dalam `StatefulBuilder`. `TextEditingController` dibuat di
-> fungsi bebas sehingga tidak ada satu pun kode yang memanggil `dispose()`.
-> Aturan validasi juga tidak bisa diuji tanpa memompa widget.
+> **Observasi.** `_promptAddNote` 29 baris (`notes_page.dart:127-155`) berisi tiga
+> tanggung jawab sekaligus: membuat `TextEditingController`, memvalidasi, dan
+> membangun `AlertDialog` di dalam `StatefulBuilder`. `TextEditingController`
+> dibuat di fungsi bebas sehingga tidak ada satu pun kode yang memanggil
+> `dispose()`. Aturan validasi juga tidak bisa diuji tanpa memompa widget.
 > **Dampak.** (a) controller bocor setiap kali dialog dibuka; (b) aturan bisnis
 > "judul tidak boleh kosong" terkunci di layer UI sehingga jalur non-UI
 > (sync, import, seed data) bisa melewatinya; (c) sulit dites.
@@ -70,8 +70,9 @@ memastikan `error.toString()` tidak memuat isi judul).
 > **Alasan.** Aturan tetap satu sumber, UI tetap tipis, dan validator bisa
 > diunit-test tanpa `testWidgets`.
 
-**Status: diterima.** `notes_page.dart` turun dari 179 → 152 baris; logika
-validasi sekarang 12 baris di `core/`.
+**Status: diterima.** `notes_page.dart` turun dari 165 → 146 baris, dialog pindah
+ke `add_note_dialog.dart` (51 baris); logika validasi sekarang 12 baris di
+`core/`.
 
 ---
 

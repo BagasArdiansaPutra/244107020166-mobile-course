@@ -11,9 +11,18 @@ ditindaklanjuti, dan tiga pemeriksaan mesin hijau.
 | NIM | 244107020166 |
 | Kelas | TI-3D |
 | Repository | https://github.com/BagasArdiansaPutra/244107020166-mobile-course |
-| Branch utama kerja | `develop` (bukan `main`) |
+| Branch kerja | `develop` untuk fitur, `main` untuk laporan |
 | Folder laporan | `08-week-8-mid-project-review/` |
 | Versi Flutter | 3.47.2 (stable) / Dart 3.13.2 |
+
+**Isi laporan:** [1 Status](#1-status-paruh-semester) · [2 Fitur](#2-fitur-utama-portfolio) ·
+[3 Stack](#3-stack-teknologi) · [4 Cara menjalankan](#4-cara-menjalankan) ·
+[5 Praktikum 1](#5-praktikum-1--hygiene-branch-dan-commit) ·
+[6 Praktikum 2](#6-praktikum-2--pr-dan-peer-review) ·
+[7 Praktikum 3](#7-praktikum-3--static-analysis-dan-mid-review) ·
+[8 AI Challenge](#8-ai-challenge) · [9 Refactoring & testing](#9-refactoring-testing-dan-error-umum) ·
+[10 Mini project](#10-mini-project--industry-challenge) · [11 Checklist](#11-checklist-verifikasi-mandiri) ·
+[12 Refleksi](#12-refleksi) · [13 Struktur folder](#13-struktur-folder-laporan)
 
 ---
 
@@ -288,9 +297,9 @@ Kurang:
 
 Baik (R3):
 
-> **Observasi.** `_promptAddNote` ~45 baris dengan tiga tanggung jawab
-> (controller, validasi, dialog) di dalam `StatefulBuilder`; controller tidak
-> pernah di-`dispose()`.
+> **Observasi.** `_promptAddNote` 29 baris (`notes_page.dart:127-155`) dengan
+> tiga tanggung jawab (controller, validasi, dialog) di dalam
+> `StatefulBuilder`; controller tidak pernah di-`dispose()`.
 > **Dampak:** controller bocor tiap dialog dibuka, dan aturan bisnis terkunci di
 > layer UI sehingga jalur sync/import bisa melewatinya.
 > **Usul:** pindahkan aturan ke `core/note_validation.dart`, dialog ke
@@ -340,15 +349,28 @@ a3acf31 feat(notes): validasi judul kosong + test (#4)
 | #6 | CI: sertakan week6 dalam matrix | `chore/ci-week6` | PR #6 | Merged (`368ec52`) |
 | #7 | Laporan mid review + checklist + AI review | `docs/week8-mid-review` | PR #7 | Merged ke `main` (fast-forward) |
 
+**Catatan transparansi.** `gh` CLI tidak tersedia di mesin praktikum, sehingga PR
+#1–#6 di-merge **lokal** dengan gaya squash (`git merge --squash`) dan PR #7
+dengan *fast-forward*. Akibatnya
+`https://api.github.com/repos/.../pulls` mengembalikan **0** dan
+`/issues` juga **0**: nomor `#1`–`#7` di tabel ini adalah ID pelacakan yang
+dipakai konsisten di seluruh laporan, bukan nomor issue/PR di github.com. Body
+issue dan body PR disimpan di `docs/` agar tetap bisa diaudit:
+[`issue-notes-validation.md`](docs/issue-notes-validation.md),
+[`pr-notes-validation.md`](docs/pr-notes-validation.md),
+[`pr-template.md`](docs/pr-template.md). Yang bisa diverifikasi langsung dari
+remote adalah **commit hasil merge** (`9623a4a`, `0e3c1fa`, `6d4e684`,
+`a3acf31`, `15c03df`, `368ec52`) dan **branch yang sudah dihapus**.
+
 Riwayat integrasi:
 
 ![Riwayat branch](screenshots/13-graph.png)
 
 Alur akhir: PR #1–#6 masuk ke `develop`, lalu `develop` di-*fast-forward* ke
-`main` bersama PR #7. Jadi `main` tidak pernah menerima commit langsung — hanya
-menerima riwayat yang sudah lolos review, dan setiap branch fitur dihapus setelah
-merge (`git ls-remote --heads origin` hanya menyisakan `main` + tiga branch
-`chore/*` lama dari Minggu 5–7).
+`main` bersama PR #7. Jadi `main` tidak menerima commit langsung dari branch
+fitur, dan setiap branch fitur dihapus setelah merge
+(`git ls-remote --heads origin` hanya menyisakan `main` + tiga branch `chore/*`
+lama dari Minggu 5–7).
 
 ---
 
@@ -427,7 +449,7 @@ Checklist lengkap: **[`docs/review-checklist.md`](docs/review-checklist.md)**.
 | `dart format` rapi | 0 file berubah | Lolos (21+17+30, 0 changed) |
 | `flutter test` hijau | semua test lulus | 8 + 19 + 24 = **51 test** |
 | PR kecil + commit jelas | 1 fitur/PR, < 300 baris | Lolos (PR #4: 7 file, 198 baris) |
-| README + screenshot + cara menjalankan | lengkap | Lolos (dokumen ini + 23 gambar) |
+| README + screenshot + cara menjalankan | lengkap | Lolos (dokumen ini + 38 gambar) |
 | Semua komentar review ditindaklanjuti | semua komentar | 5 temuan sejawat, 5 temuan AI (2 diterima, 3 ditolak beralasan) |
 | Aplikasi identik akhir Minggu 7 | tanpa ubah perilaku | Lolos (hanya validasi judul) |
 
@@ -635,7 +657,75 @@ Langkah manual PR #4 (5 menit), sekarang juga dikunci widget test:
 
 ---
 
-## 10. Checklist verifikasi mandiri
+## 10. Mini project / Industry Challenge
+
+### 10.1 Kebutuhan → bukti
+
+![Mini project](screenshots/30-mini-project.png)
+
+| Kebutuhan jobsheet | Status | Bukti yang bisa diperiksa |
+|---|---|---|
+| Lanjutkan repo portfolio Minggu 5–7 (bukan project baru) | Terpenuhi | Tidak ada project baru; seluruh perubahan berada di `week5_local_storage_offline_first`, `week6_authentication_security_fcm`, `week_7_clean_architecture`, dan folder laporan |
+| Minimal 1 issue | Terpenuhi | [`docs/issue-notes-validation.md`](docs/issue-notes-validation.md) — gejala, langkah reproduksi, kriteria penerimaan, rencana uji |
+| Minimal 1 PR kecil di-merge via review sejawat (`feature/*` → `develop`) | Terpenuhi | `feat/notes-validation` → `develop`, 7 file/+198/−24, review `Request changes` → `Approve`, squash `a3acf31` |
+| Template PR lengkap: masalah, solusi, cara uji, screenshot | Terpenuhi | [`docs/pr-template.md`](docs/pr-template.md) + [`docs/pr-notes-validation.md`](docs/pr-notes-validation.md) |
+| Bukti mesin hijau (`flutter analyze` + `flutter test`) di README | Terpenuhi | Bagian 7.1 dan 9.3 dokumen ini |
+| Dokumentasi prompt AI, tabel usulan vs keputusan, bukti terima/tolak | Terpenuhi | [`docs/ai-review-vs-keputusan.md`](docs/ai-review-vs-keputusan.md) |
+| Struktur `docs/`, `README.md`, `screenshots/` | Terpenuhi | Bagian 13 dokumen ini |
+| README: status paruh semester, peta issue/PR, fitur, stack, cara menjalankan, hasil | Terpenuhi | Bagian 1, 2, 3, 4, 6.5, dan 10.3 |
+
+**Catatan pengerjaan.** Tugas ini dikerjakan langsung di `main` sesuai instruksi
+(agar riwayat laporan tetap satu garis), sehingga **tidak ada branch baru** yang
+dibuat untuk langkah ini. Disiplin `feature/* → develop` dibuktikan oleh pekerjaan
+PR #4 yang sudah selesai: branch dibuat dari `develop`, direview, di-*squash*,
+lalu dihapus dari lokal dan remote.
+
+### 10.2 Isi PR yang dikirim
+
+| Bagian template | Isi aktual |
+|---|---|
+| **Masalah** | Menekan Simpan dengan judul kosong menutup dialog tanpa menyimpan dan tanpa pesan; `NoteRepository.addNote` menerima judul kosong |
+| **Solusi** | `core/note_validation.dart` (fungsi murni) + `AddNoteDialog` (StatefulWidget, `dispose`, reset error) + guard di repository sebelum `_openDb()` |
+| **Cara uji** | 4 langkah manual + 3 perintah otomatis |
+| **Screenshot** | `08-test-w5.png` (8 test hijau), `17-pr-kecil.png` (ukuran diff) |
+| **Hasil mesin** | analyze: No issues found! · format: 21 files (0 changed) · test: +8 All tests passed! |
+| **Dampak** | 7 file, +198 / −24 baris, tanpa perubahan skema database |
+
+### 10.3 Hasil yang dicapai
+
+| Metrik | Sebelum Minggu 8 | Sesudah |
+|---|---|---|
+| Test otomatis week5 | 0 | **8** |
+| Total test portfolio (week5+6+7) | 43 | **51** |
+| Issue analyzer (3 project) | ada info `package_names`, `curly_braces_...` | **0** |
+| `dart format` file berubah | 29 (repo-wide) | **0** |
+| PR di atas 300 baris | 6 commit besar (hingga +13.609) | **0** (semua ≤ 198; PR #7 dipecah 3) |
+| Bug yang lolos ke review | 2 (error menempel, judul bocor ke log) | ditutup + dikunci widget test |
+| Branch fitur menggantung | 1 (`feat/notes-validation`) | **0** |
+| Gate CI | tidak ada | analyze + format + test, terbukti exit `1` saat kotor |
+
+Yang **tidak** berubah: perilaku aplikasi selain validasi judul. Fitur Minggu 5–7
+(offline-first, auth + refresh 401, deep link, FCM, feature-first) tetap sama —
+dibuktikan oleh 51 test yang tidak satu pun diubah perilakunya.
+
+### 10.4 Berkas yang diserahkan
+
+| Berkas | Isi |
+|---|---|
+| `README.md` | laporan lengkap (bagian ini) |
+| `docs/issue-notes-validation.md` | body issue #4 + kriteria penerimaan |
+| `docs/pr-notes-validation.md` | body PR #4 |
+| `docs/pr-template.md` | template PR + contoh terisi + aturan pengikat |
+| `docs/peer-review-notes-validation.md` | 5 temuan reviewer + keputusan |
+| `docs/ai-review-vs-keputusan.md` | prompt, output AI, tabel keputusan, bukti |
+| `docs/review-checklist.md` | tabel sebelum/sesudah commit + kesiapan mid review |
+| `docs/refactoring-split.md` | pemecahan PR 970 baris jadi 3 PR |
+| `docs/testing-evidence.md` | bukti uji per PR + langkah manual |
+| `screenshots/` | 38 bukti gambar tiap langkah |
+
+---
+
+## 11. Checklist verifikasi mandiri
 
 - [x] Branch dari `develop`; `main` tidak disentuh setelah `develop` dibuat.
 - [x] PR kecil satu fitur (198 baris) ke `develop`, issue tertutup via PR (`Closes #4`).
@@ -650,56 +740,135 @@ Langkah manual PR #4 (5 menit), sekarang juga dikunci widget test:
 - [x] Prompt, output awal AI, dan bukti test/analyze tersimpan di `docs/ai-review-vs-keputusan.md`.
 - [x] Satu PR > 300 baris dipecah menjadi 3 PR berurutan (`docs/refactoring-split.md`).
 - [x] Bukti testing per PR + langkah manual 5 menit tersimpan di `docs/testing-evidence.md`.
+- [x] Issue + PR + template PR terdokumentasi (`docs/issue-notes-validation.md`, `docs/pr-notes-validation.md`, `docs/pr-template.md`).
 - [x] README memuat status paruh semester, peta issue/PR, fitur, stack, cara menjalankan, dan screenshot.
 
 ---
 
-## 11. Refleksi
+## 12. Refleksi
 
 **1. Apa beda LGTM buta dengan approve yang bertanggung jawab? Apa risikonya bagi tim?**
 
-LGTM buta adalah "saya percaya penulisnya"; approve bertanggung jawab adalah
-"saya sudah checkout branch ini, menjalankan test, dan bisa menjelaskan setiap
-perubahan". Pada PR ini LGTM buta akan meloloskan dua bug yang benar-benar ada:
-pesan error yang tidak pernah hilang (R1) dan isi catatan yang tercetak di
-exception (R2) — keduanya tidak terlihat dari membaca diff sekilas, hanya
-ketahuan saat widget dijalankan. Risikonya bagi tim bukan cuma bug: review
-menjadi ritual, sehingga anggota tim berhenti membaca PR dan satu orang menjadi
-satu-satunya penjaga kualitas. Ketika orang itu sibuk, seluruh tim buta.
+![Refleksi 1](screenshots/33-refleksi.png)
 
-**2. Kapan komentar wajib `request changes`, dan kapan cukup saran?**
+LGTM buta berbunyi "saya percaya penulisnya". Approve yang bertanggung jawab
+berbunyi "saya sudah checkout branch ini, menjalankan tiga perintah mesin,
+mengulang langkah manualnya, dan bisa menjelaskan setiap hunk". Bedanya bukan
+sikap, melainkan **bukti**: yang pertama tidak meninggalkan jejak apa pun, yang
+kedua meninggalkan exit code, output test, dan screenshot.
 
-`request changes` bila ada **bug yang bisa direproduksi**, **kebocoran data**,
-atau **pelanggaran arsitektur yang menular** (mis. domain mengimpor Flutter).
-R1, R2, R3 masuk kategori ini karena masing-masing punya dampak yang bisa
-ditunjukkan. Cukup saran bila perubahan bersifat preferensi atau baru berguna
-pada skala lain — mis. R5 (konstanta pesan error) dan A4/A5 dari AI: tidak ada
-bug yang hilang bila tidak dikerjakan, sehingga tidak pantas menahan merge.
+Pada PR #4, LGTM buta akan meloloskan dua bug nyata:
+
+- **R1** — `errorText` tidak pernah di-reset, jadi pesan "tidak boleh kosong"
+  menempel setelah pengguna mengetik judul yang benar.
+- **R2** — `ArgumentError.value(title, ...)` mencetak isi catatan ke
+  `toString()`, sehingga isi catatan pribadi bisa masuk log/crash report.
+
+Keduanya **tidak terlihat dari diff**. R1 butuh memompa widget dua kali
+(tekan Simpan → ketik), R2 butuh membaca isi exception, bukan bentuk kodenya.
+Itu sebabnya reviewer di repo ini wajib menjalankan, bukan hanya membaca
+(`docs/testing-evidence.md` bagian 6).
+
+Risikonya bagi tim berlapis:
+
+1. **Bug lolos** — dua di atas adalah contoh konkret, bukan hipotesis.
+2. **Review jadi ritual** — kalau approve tidak pernah menolak apa pun, anggota
+   tim berhenti membaca PR. Nilai review turun ke nol tanpa ada yang sadar.
+3. **Satu orang jadi penjaga tunggal** — kualitas bergantung pada satu reviewer
+   yang rajin. Saat ia sibuk, seluruh tim buta bersamaan.
+4. **Pengetahuan tidak menyebar** — komentar yang menjelaskan *mengapa* (pola
+   observasi → dampak → usulan) adalah transfer pengetahuan. LGTM tidak
+   mentransfer apa pun.
+
+**2. Kapan komentar wajib berstatus `request changes`, dan kapan cukup saran?**
+
+![Refleksi 2](screenshots/34-refleksi-2.png)
+
+Saya memakai tiga pemicu `request changes`, semuanya harus **bisa ditunjukkan**,
+bukan dirasakan:
+
+| Pemicu | Contoh di PR ini | Mengapa menahan merge |
+|---|---|---|
+| Bug yang bisa direproduksi | R1 (error menempel), R2 (judul bocor ke log) | Ada langkah reproduksi; pengguna terkena dampaknya |
+| Kebocoran data | R2 | Isi catatan adalah data pribadi; log/crash report bisa dibaca orang lain |
+| Pelanggaran arsitektur yang menular | R3 (validasi terkunci di UI, controller tanpa `dispose`) | Kalau dibiarkan, jalur sync/import berikutnya akan menyalin pola yang sama |
+
+Cukup **saran** bila tidak ada bug yang hilang saat tidak dikerjakan:
+
+- **R5** (konstanta pesan error) — pesan hanya dipakai sekali di produksi; test
+  justru sengaja mengunci teksnya.
+- **A4** (`Form` + `GlobalKey`) dan **A5** (validasi di provider) — menambah
+  state yang harus dikelola tanpa mengubah perilaku.
+
+Batas praktisnya: **kalau saya tidak bisa menulis langkah reproduksi atau
+menunjuk baris yang melanggar aturan, itu saran, bukan `request changes`.**
+Konsekuensinya PR tidak boleh ditahan karena selera.
 
 **3. Bagian mana dari review AI yang saya tolak atau sederhanakan, dan mengapa?**
 
-Saya menolak A3 (`Either<Failure, Note>`), A4 (`Form` + `GlobalKey`), dan A5
-(validasi di provider). A3 mengimpor pola dari week7 ke project yang memang
-belum clean architecture, dan salah kategori: judul kosong adalah pelanggaran
-kontrak pemanggil, bukan kegagalan domain. A4 dan A5 "lebih idiomatik" tetapi
-tidak menghilangkan satu bug pun, sementara menambah state yang harus dikelola
-dan membuat test lebih berat. Yang saya sederhanakan: A1 saya terapkan sebagai
-guard 5 baris di repository, bukan sebagai layer validasi baru.
+![Refleksi 3](screenshots/35-refleksi-3.png)
+
+Dari lima temuan AI, **dua diterima** dan **tiga ditolak**.
+
+Diterima:
+
+- **A1** — validasi hanya di UI. Diverifikasi dengan grep: commit `6d4e684`
+  tidak memuat `validate` di repository. Diterapkan sebagai guard 5 baris
+  **sebelum** `_openDb()`, bukan sebagai layer baru.
+- **A2** — `TextEditingController` tanpa `dispose()`. Ini bug berupa *absence*
+  yang tidak muncul di diff mana pun; hanya ketahuan dengan mencari kata
+  `dispose` dan tidak menemukannya.
+
+Ditolak, dengan alasan tertulis:
+
+- **A3** (`Either<Failure, Note>`) — menyalin pola week7 ke week5 yang masih
+  layer-first. Menambah `core/failures.dart` + `Either` berarti menambah layer
+  tanpa menghilangkan satu bug pun, dan salah kategori: judul kosong adalah
+  pelanggaran kontrak pemanggil, bukan kegagalan domain/jaringan/disk.
+- **A4** (`Form` + `GlobalKey<FormState>`) — untuk satu field, `errorText` sudah
+  bisa diuji lewat `find.text(...)`. Migrasi baru masuk akal bila dialog punya
+  banyak field.
+- **A5** (validasi di provider Riverpod) — `validateNoteTitle` adalah fungsi
+  murni `String → String?`. Membungkusnya dalam `StateNotifier` memaksa setiap
+  test membangun `ProviderContainer`, memperlambat umpan balik tanpa manfaat.
+
+Yang **disederhanakan**: A1 tidak dijadikan use case/validator layer, cukup
+fungsi murni + guard repository. Hasilnya aturan tetap satu sumber (dipakai UI
+**dan** repository) tanpa menambah abstraksi.
+
+Pelajaran yang saya bawa: AI paling berguna untuk menemukan **ketiadaan**
+(`dispose` yang tidak ada, validasi yang tidak dipanggil) — hal yang tidak
+terlihat dari membaca diff. AI paling berbahaya saat **mengimpor pola dari
+konteks lain** dan saat menyarankan "lebih idiomatik" tanpa mengukur manfaat.
 
 **4. Satu hal konkret yang saya perbaiki setelah review sejawat — apa dampaknya?**
 
-Memindahkan dialog ke `AddNoteDialog` (StatefulWidget) sehingga
-`TextEditingController` punya pemilik dan di-`dispose()`. Dampak langsung: tidak
-ada lagi controller yang bocor setiap dialog dibuka, `notes_page.dart` turun dari
-179 → 152 baris, dan dialog menjadi satu-satunya tempat yang bisa dites — dari 0
-menjadi 3 widget test (error muncul, error hilang saat mengetik, judul ter-trim).
-Efek sampingnya positif: karena validasi dipindah ke fungsi murni
-`validateNoteTitle`, aturan yang sama sekarang dipakai UI **dan** repository,
-sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
+![Refleksi 4](screenshots/36-refleksi-4.png)
+
+Memindahkan dialog dari closure `StatefulBuilder` di `notes_page.dart` ke
+`AddNoteDialog` sebagai `StatefulWidget`, sehingga `TextEditingController`
+punya pemilik dan benar-benar di-`dispose()`.
+
+Dampak yang bisa diukur:
+
+| Sebelum | Sesudah |
+|---|---|
+| `_promptAddNote` 29 baris (`notes_page.dart:127-155`), 3 tanggung jawab (controller, validasi, dialog) | `notes_page.dart` turun 165 → 146 baris; dialog 51 baris dengan satu tanggung jawab |
+| Controller bocor setiap dialog dibuka | `dispose()` di `_AddNoteDialogState` (baris 17–19) |
+| 0 widget test untuk dialog | **3** widget test (error muncul, error hilang saat mengetik, judul ter-trim) |
+| Aturan validasi hanya di UI, tidak bisa diuji tanpa widget | `validateNoteTitle` fungsi murni, dipakai UI **dan** `NoteRepository.addNote` |
+
+Efek sampingnya yang paling penting: karena aturan dipindah ke fungsi murni dan
+dipanggil juga di repository, jalur non-UI (sync/import) **tidak bisa lagi**
+menyimpan judul kosong. Satu perbaikan menutup dua pintu sekaligus — dan itu
+terjadi karena reviewer memaksa memikirkan arsitektur, bukan hanya tampilan.
+
+Bukti: `screenshots/20-re-review-approve.png`, `22-static-analysis.png`,
+`docs/peer-review-notes-validation.md` (R1–R4), `docs/testing-evidence.md`.
 
 ---
 
-## 12. Struktur folder laporan
+## 13. Struktur folder laporan
 
 ```
 08-week-8-mid-project-review/
@@ -710,7 +879,9 @@ sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
 │   ├── peer-review-notes-validation.md# 5 temuan reviewer + keputusan
 │   ├── ai-review-vs-keputusan.md      # prompt, output AI, tabel usulan vs keputusan, bukti
 │   ├── refactoring-split.md           # pemecahan satu PR 970 baris jadi 3 PR kecil
-│   └── testing-evidence.md            # bukti uji per PR + langkah manual 5 menit
+│   ├── testing-evidence.md            # bukti uji per PR + langkah manual 5 menit
+│   ├── issue-notes-validation.md      # body issue #4 + kriteria penerimaan
+│   └── pr-template.md                 # template PR + contoh terisi + aturan pengikat
 └── screenshots/
     ├── 01-audit.png                   # git log / branch / status
     ├── 02-develop.png                 # pembuatan branch develop
@@ -741,8 +912,13 @@ sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
     ├── 27-ai-verifikasi.png           # AI Challenge — grep + uji balik membuktikan A1/A2
     ├── 28-ai-keputusan.png            # AI Challenge — usulan vs keputusan + bukti mesin
     ├── 29-refactor-split.png          # Praktikum 7.1 — satu PR 970 baris dipecah 3 PR
+    ├── 30-mini-project.png            # Tugas — kebutuhan jobsheet -> bukti
     ├── 31-testing-evidence.png        # Praktikum 7.3 — bukti testing per PR + manual 5 menit
     ├── 32-error-checklist.png         # Praktikum 7.4 — error umum + checklist mandiri
+    ├── 33-refleksi.png                # Refleksi 1 — LGTM buta vs approve bertanggung jawab
+    ├── 34-refleksi-2.png              # Refleksi 2 — request changes vs saran
+    ├── 35-refleksi-3.png              # Refleksi 3 — review AI yang ditolak/disederhanakan
+    ├── 36-refleksi-4.png              # Refleksi 4 — perbaikan konkret dan dampaknya
     ├── app-week5-notes.png            # screenshot aplikasi week5
     └── app-week6-fcm.png              # screenshot aplikasi week6
 ```
