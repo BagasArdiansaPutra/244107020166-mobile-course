@@ -356,19 +356,33 @@ merge (`git ls-remote --heads origin` hanya menyisakan `main` + tiga branch
 
 ### 7.1 Tiga perintah mesin
 
+Dijalankan ulang pada commit terakhir (`ca3c9a0`) — ketiganya hijau:
+
+![Tiga perintah mesin](screenshots/22-static-analysis.png)
+
 | Project | `flutter analyze` | `dart format` | `flutter test` |
 |---|---|---|---|
+| week5 | No issues found! | 21 files (0 changed) | **8** lulus |
+| week6 | No issues found! | 17 files (0 changed) | **19** lulus |
+| week7 | No issues found! | 30 files (0 changed) | **24** lulus |
+
+Total **51 test hijau**, 0 issue analyzer, 0 file berubah. Bukti per project:
+
+| Project | analyze | format | test |
+|---|---|---|---|
 | week5 | ![analyze](screenshots/06-analyze-w5.png) | ![format](screenshots/07-format-w5.png) | ![test](screenshots/08-test-w5.png) |
-| week6 | ![analyze](screenshots/15-analyze-w6.png) | (sama, 0 changed) | ![test](screenshots/16-test-w6.png) |
-| week7 | ![analyze](screenshots/09-analyze-w7.png) | (sama, 0 changed) | ![test](screenshots/10-test-w7.png) |
+| week6 | ![analyze](screenshots/15-analyze-w6.png) | (0 changed) | ![test](screenshots/16-test-w6.png) |
+| week7 | ![analyze](screenshots/09-analyze-w7.png) | (0 changed) | ![test](screenshots/10-test-w7.png) |
 
-Temuan nyata yang diperbaiki pada tahap ini:
+Urutan perbaikan yang dipakai: **error → warning → info**. Temuan nyata yang
+diperbaiki pada tahap ini:
 
-| Gejala analyzer | Lokasi | Perbaikan |
-|---|---|---|
-| `package_names` (info) | `week5`, `week6`, `week7` — nama package diawali `_0X_` | Ganti ke `week5_local_storage_offline_first`, `week6_authentication_security_fcm`, `week7_clean_architecture` + sesuaikan import test |
-| `curly_braces_in_flow_control_structures` (info) | `week7/lib/features/auth/data/datasources/auth_api.dart:34` | Bungkus `throw` dengan `{ }` |
-| `dart format` 29 file berubah (repo-wide) | `week3_todo`, `week4_api`, `week6`, `week7` | Format per project, bukan seluruh repo, agar PR tetap kecil |
+| Gejala analyzer | Level | Lokasi | Perbaikan |
+|---|---|---|---|
+| `package_names` | info | `week5`, `week6`, `week7` — nama package diawali `_0X_` | Ganti ke `week5_local_storage_offline_first`, `week6_authentication_security_fcm`, `week7_clean_architecture` + sesuaikan import test |
+| `curly_braces_in_flow_control_structures` | info | `week7/lib/features/auth/data/datasources/auth_api.dart:34` | Bungkus `throw` dengan `{ }` |
+| `unused_import` | warning | ditemukan lagi saat uji gate CI (lihat 7.2) | Hapus import mati — bukan `// ignore` |
+| `dart format` 29 file berubah (repo-wide) | — | `week3_todo`, `week4_api`, `week6`, `week7` | Format per project, bukan seluruh repo, agar PR tetap kecil |
 
 ### 7.2 CI menolak PR kotor
 
@@ -378,18 +392,44 @@ Temuan nyata yang diperbaiki pada tahap ini:
 dengan matrix tiga project. Langkahnya: `flutter pub get` → `flutter analyze` →
 `dart format --output=none --set-exit-if-changed .` → `flutter test`.
 
+Gate itu tidak hanya ditulis, tapi diuji bisa **gagal**. Satu file kotor
+(`unused_import` + format berantakan) dan satu test yang sengaja gagal
+disisipkan, lalu ketiga perintah dijalankan:
+
+![Gate CI menolak PR kotor](screenshots/23-ci-menolak-kotor.png)
+
+| Gerbang | Output | Exit code |
+|---|---|---|
+| `flutter analyze` | `warning - Unused import: 'dart:math' ... unused_import` | `1` |
+| `dart format --set-exit-if-changed .` | `Changed lib\tmp_ci_demo.dart` / `22 files (1 changed)` | `1` |
+| `flutter test` | `Expected: <2> Actual: <1>` / `Some tests failed` | `1` |
+
+File simulasi langsung dihapus dan `git status --short` kembali kosong, sehingga
+tidak ada sampah yang ikut ter-commit. Artinya PR dengan import mati, format
+berantakan, atau test gagal **ditolak mesin sebelum dibaca manusia**.
+
+Catatan: repositori ini belum punya riwayat run Actions di GitHub
+(`/actions/runs` mengembalikan 0), karena workflow baru ada di branch dan
+riwayat PR #1–#7 dibuat lewat merge lokal (tanpa `gh` CLI). Karena itu bukti
+yang disajikan adalah eksekusi lokal perintah yang sama persis dengan isi
+workflow, bukan tautan badge CI.
+
 ### 7.3 Nilai kesiapan tengah semester
+
+![Kesiapan mid review](screenshots/24-kesiapan-mid-review.png)
 
 Checklist lengkap: **[`docs/review-checklist.md`](docs/review-checklist.md)**.
 
-| Kriteria | Hasil |
-|---|---|
-| Struktur feature-first terbukti (3 grep sterilitas) | Kosong semua → lolos |
-| `flutter analyze` bersih | 0 issue (3 project) |
-| `flutter test` hijau | 51 test |
-| PR kecil + commit jelas | 7 PR, PR fitur 198 baris |
-| README + screenshot + cara menjalankan | Dokumen ini |
-| Semua komentar review ditindaklanjuti | 5 temuan sejawat, 5 temuan AI (2 diterima, 3 ditolak beralasan) |
+| Kriteria | Target | Hasil |
+|---|---|---|
+| Struktur feature-first terbukti (3 grep sterilitas) | 3 grep kosong | Lolos (3/3 kosong, exit `1`) |
+| `flutter analyze` bersih | 0 issue di 3 project | Lolos |
+| `dart format` rapi | 0 file berubah | Lolos (21+17+30, 0 changed) |
+| `flutter test` hijau | semua test lulus | 8 + 19 + 24 = **51 test** |
+| PR kecil + commit jelas | 1 fitur/PR, < 300 baris | Lolos (PR #4: 7 file, 198 baris) |
+| README + screenshot + cara menjalankan | lengkap | Lolos (dokumen ini + 23 gambar) |
+| Semua komentar review ditindaklanjuti | semua komentar | 5 temuan sejawat, 5 temuan AI (2 diterima, 3 ditolak beralasan) |
+| Aplikasi identik akhir Minggu 7 | tanpa ubah perilaku | Lolos (hanya validasi judul) |
 
 Uji sterilitas dependency rule (diulang di Minggu 8):
 
@@ -400,6 +440,19 @@ grep -RInE "^import .*features/[a-z_]+/data" lib/features/*/presentation   # kos
 grep -RInE "^import .*package:(flutter|dio|sqflite)" lib/features/*/domain # kosong
 grep -RInE "^import .*presentation" lib/features/*/data                    # kosong
 ```
+
+### 7.4 Definisi selesai (mid review)
+
+| Syarat | Status | Bukti |
+|---|---|---|
+| Aplikasi berjalan identik dengan akhir Minggu 7 | Terpenuhi | PR #4 hanya menambah validasi judul; PR #1–#3, #5–#6 hanya nama package, format, dan CI |
+| Tiga pemeriksaan mesin hijau | Terpenuhi | `22-static-analysis.png`, `06`–`10`, `15`–`16` |
+| Minimal 1 PR kecil per pasangan sudah di-merge via review | Terpenuhi | PR #4 (Request changes → Approve → squash `a3acf31`), `20`–`21` |
+| README memuat status paruh semester + peta issue/PR | Terpenuhi | Bagian 1 dan 6.5 dokumen ini |
+
+**Kesimpulan: mid review lolos.** Fondasi paruh kedua (branch hygiene, review
+yang bermakna, dan gate mesin) bisa dipercaya; yang belum ada bukan bug, melainkan
+fitur paruh kedua.
 
 ---
 
@@ -476,6 +529,8 @@ flutter test
 - [x] PR kecil satu fitur (198 baris) ke `develop`, issue tertutup via PR (`Closes #4`).
 - [x] Reviewer menghasilkan 2 temuan kebenaran (R1, R2), 1 arsitektur (R3), 1 test (R4), 1 keterbacaan (R5) — putaran 1 `Request changes`, putaran 2 `Approve`.
 - [x] Tindak lanjut → re-review → merge squash (`2ff9393` + `719f645` → `a3acf31`), branch fitur dihapus (lokal & remote).
+- [x] Gate CI (`analyze` + `format` + `test`) terbukti menolak PR kotor dengan exit code `1`.
+- [x] Definisi selesai mid review terpenuhi (bagian 7.4).
 - [x] `flutter analyze` bersih di week5, week6, week7.
 - [x] `dart format` rapi (0 file berubah).
 - [x] `flutter test` hijau (8 + 19 + 24 = 51).
@@ -561,6 +616,9 @@ sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
     ├── 19-komentar-baik.png           # Praktikum 2.3 — pola observasi -> dampak -> usulan
     ├── 20-re-review-approve.png       # Praktikum 2.4 — tindak lanjut + Approve
     ├── 21-merge-cleanup.png           # Praktikum 2.4 — merge squash, issue closed, branch dihapus
+    ├── 22-static-analysis.png         # Praktikum 3.1 — analyze/format/test hijau di 3 project
+    ├── 23-ci-menolak-kotor.png        # Praktikum 3.2 — gate CI terbukti menolak (exit 1)
+    ├── 24-kesiapan-mid-review.png     # Praktikum 3.3 — sterilitas + nilai kesiapan + DoD
     ├── app-week5-notes.png            # screenshot aplikasi week5
     └── app-week6-fcm.png              # screenshot aplikasi week6
 ```

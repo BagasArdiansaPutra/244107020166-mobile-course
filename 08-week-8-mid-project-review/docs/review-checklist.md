@@ -60,13 +60,14 @@ Masalah yang ditemukan:
 
 | Kriteria | Target | Hasil | Bukti |
 |----------|--------|-------|-------|
-| Struktur feature-first terbukti | 3 grep sterilitas kosong | Lolos | `screenshots/12-sterility.png` |
-| `flutter analyze` bersih | 0 issue di week5, week6, week7 | Lolos | `screenshots/06-analyze-w5.png`, `screenshots/09-analyze-w7.png`, `screenshots/15-analyze-w6.png` |
-| `dart format` rapi | 0 file berubah | Lolos | `screenshots/07-format-w5.png` |
-| `flutter test` hijau | semua test lulus | 8 + 19 + 24 = **51 test** | `screenshots/08-test-w5.png`, `screenshots/16-test-w6.png`, `screenshots/10-test-w7.png` |
-| PR kecil + commit jelas | 1 fitur per PR, < 300 baris | 7 PR, PR fitur 198 baris | `docs/pr-notes-validation.md` |
-| Review ditindaklanjuti | semua komentar terjawab | 5 temuan sejawat + 5 temuan AI | `docs/peer-review-notes-validation.md`, `docs/ai-review-vs-keputusan.md` |
-| README + screenshot + cara menjalankan | lengkap | Lolos | `README.md` |
+| Struktur feature-first terbukti | 3 grep sterilitas kosong | Lolos (3/3 kosong, exit `1`) | `screenshots/12-sterility.png`, `screenshots/24-kesiapan-mid-review.png` |
+| `flutter analyze` bersih | 0 issue di week5, week6, week7 | Lolos | `screenshots/22-static-analysis.png`, `06-analyze-w5.png`, `09-analyze-w7.png`, `15-analyze-w6.png` |
+| `dart format` rapi | 0 file berubah | Lolos (21 + 17 + 30, 0 changed) | `screenshots/22-static-analysis.png`, `screenshots/07-format-w5.png` |
+| `flutter test` hijau | semua test lulus | 8 + 19 + 24 = **51 test** | `screenshots/22-static-analysis.png`, `08-test-w5.png`, `16-test-w6.png`, `10-test-w7.png` |
+| CI menolak PR kotor | analyze/format/test gagal → exit `1` | Lolos (3 gerbang diuji bisa merah) | `screenshots/11-ci.png`, `screenshots/23-ci-menolak-kotor.png` |
+| PR kecil + commit jelas | 1 fitur per PR, < 300 baris | 7 PR, PR fitur 198 baris | `docs/pr-notes-validation.md`, `screenshots/17-pr-kecil.png` |
+| Review ditindaklanjuti | semua komentar terjawab | 5 temuan sejawat + 5 temuan AI | `docs/peer-review-notes-validation.md`, `docs/ai-review-vs-keputusan.md`, `screenshots/18`–`20` |
+| README + screenshot + cara menjalankan | lengkap | Lolos (23 gambar, tautan terverifikasi) | `README.md` |
 | Aplikasi berjalan identik dengan akhir Minggu 7 | tidak ada perubahan perilaku selain validasi judul | Lolos | PR #4 hanya menambah validasi; PR #1–#3,#5–#6 hanya format/nama package/CI |
 
 ### Uji sterilitas dependency rule (Minggu 7, diulang di Minggu 8)
@@ -82,10 +83,20 @@ $ grep -RInE "^import .*presentation" lib/features/*/data
 (tidak ada output)
 ```
 
-Ketiganya kosong → aturan dependensi `presentation -> domain <- data` masih terjaga
-setelah semua perubahan Minggu 8.
+Ketiganya kosong (exit code `1` = tidak ada baris cocok) → aturan dependensi
+`presentation -> domain <- data` masih terjaga setelah semua perubahan Minggu 8.
+
+### Definisi selesai mid review
+
+| Syarat | Status | Bukti |
+|---|---|---|
+| Aplikasi berjalan identik dengan akhir Minggu 7 | Terpenuhi | PR #4 hanya menambah validasi judul |
+| Tiga pemeriksaan mesin hijau | Terpenuhi | `screenshots/22-static-analysis.png` |
+| Minimal 1 PR kecil per pasangan sudah di-merge via review | Terpenuhi | PR #4: Request changes → Approve → squash `a3acf31` |
+| README memuat status paruh semester + peta issue/PR | Terpenuhi | Bagian 1 dan 6.5 `README.md` |
 
 ### Status: **SIAP mid review**
 
 Tidak ada PR berstatus *request changes* yang belum ditindaklanjuti, tidak ada
-branch fitur yang menggantung, dan `develop` selalu hijau.
+branch fitur yang menggantung (branch `feat/*` sudah dihapus lokal dan remote),
+dan `develop` selalu hijau.
