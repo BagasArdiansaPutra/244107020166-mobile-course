@@ -229,7 +229,9 @@ Tabel sebelum → sesudah lengkap ada di
 
 ## 6. Praktikum 2 — PR dan peer review
 
-### 6.1 PR kecil
+### 6.1 Buka PR kecil
+
+![PR kecil](screenshots/17-pr-kecil.png)
 
 Body PR lengkap: **[`docs/pr-notes-validation.md`](docs/pr-notes-validation.md)**.
 
@@ -244,14 +246,29 @@ Closes #4
 ```
 
 Ukuran PR: **7 file, +198 / −24 baris** — di bawah batas 300 baris sehingga bisa
-direview < 15 menit.
+direview < 15 menit. Target PR adalah `develop`, bukan `main`.
+
+Catatan jujur: jobsheet menulis "validasi di **use case**". Project week5 belum
+memakai clean architecture (itu materi week7), jadi padanan terdekat adalah
+fungsi murni `core/note_validation.dart` yang dipanggil dari **UI dan
+repository**. Alasannya ditulis di body PR agar reviewer tidak mengira layer
+`domain/use_case` sengaja dilewati.
 
 ### 6.2 Review sejawat 15 menit
 
+![Peer review](screenshots/18-peer-review.png)
+
 Catatan lengkap: **[`docs/peer-review-notes-validation.md`](docs/peer-review-notes-validation.md)**.
 
-Keputusan putaran 1: **Request changes** (2 blocker + 1 arsitektur + 1 test).
-Keputusan putaran 2: **Approve**.
+Keputusan putaran 1: **Request changes**. Kewajiban minimum reviewer terpenuhi
+seluruhnya:
+
+| Kewajiban | Temuan |
+|---|---|
+| 2 temuan kebenaran | R1 (`errorText` tidak pernah di-reset → state "menempel"), R2 (`ArgumentError.value` membocorkan isi judul ke log) |
+| 1 temuan arsitektur | R3 (validasi terkunci di presentation; `TextEditingController` tanpa pemilik → bocor) |
+| 1 temuan test | R4 (hanya jalur sukses; tidak ada bukti UI menampilkan error / repository menolak sebelum buka DB) |
+| 1 saran keterbacaan | R5 (pesan error hard-coded di produksi & test) |
 
 | ID | Kategori | Temuan | Keputusan |
 |---|---|---|---|
@@ -261,9 +278,17 @@ Keputusan putaran 2: **Approve**.
 | R4 | Test | Hanya jalur sukses; tidak ada bukti UI menampilkan error / repository menolak sebelum buka DB | Diterima → 8 test |
 | R5 | Keterbacaan | Pesan error hard-coded di produksi & test | **Ditolak** dengan alasan tertulis (test sengaja mengunci teks) |
 
-Contoh komentar yang bisa ditindaklanjuti (pola observasi → dampak → usulan):
+### 6.3 Komentar yang baik: observasi → dampak → usulan
 
-> **R3 — Arsitektur.** `_promptAddNote` ~45 baris dengan tiga tanggung jawab
+![Pola komentar](screenshots/19-komentar-baik.png)
+
+Kurang:
+
+> "kode ini jelek, perbaiki"
+
+Baik (R3):
+
+> **Observasi.** `_promptAddNote` ~45 baris dengan tiga tanggung jawab
 > (controller, validasi, dialog) di dalam `StatefulBuilder`; controller tidak
 > pernah di-`dispose()`.
 > **Dampak:** controller bocor tiap dialog dibuka, dan aturan bisnis terkunci di
@@ -273,23 +298,47 @@ Contoh komentar yang bisa ditindaklanjuti (pola observasi → dampak → usulan)
 > `NoteRepository.addNote`.
 > **Alasan:** satu sumber aturan, UI tipis, dan bisa diunit-test tanpa widget.
 
-### 6.3 Tindak lanjut dan merge
+Aturan yang dipakai: keras pada kode, baik pada manusia; setiap komentar harus
+bisa ditindaklanjuti tanpa bertanya ulang (menyebut file, baris, dan bentuk
+perbaikannya).
 
-Perbaikan dikerjakan di commit `2ff9393` pada branch yang sama, lalu
-di-squash ke `develop` sebagai `a3acf31 feat(notes): validasi judul kosong + test (#4)`
-agar commit perantara tidak mengotori riwayat.
+### 6.4 Tindak lanjut, re-review, dan merge
 
-### 6.4 Peta issue → PR
+![Re-review approve](screenshots/20-re-review-approve.png)
+
+Perbaikan dikerjakan di commit `2ff9393` pada branch yang sama, lalu author
+meminta re-review. Keputusan putaran 2: **Approve** (R1–R4 diterima, R5 ditolak
+dengan alasan tertulis).
+
+![Merge dan cleanup](screenshots/21-merge-cleanup.png)
+
+Karena branch memuat dua commit perantara (`719f645` fitur + `2ff9393` tindak
+lanjut), merge dilakukan dengan **squash** sehingga `develop` hanya menerima
+satu commit bersih:
+
+```
+a3acf31 feat(notes): validasi judul kosong + test (#4)
+ 7 files changed, 198 insertions(+), 24 deletions(-)
+```
+
+| Kriteria langkah 4 | Hasil |
+|---|---|
+| Author memperbaiki lalu minta re-review | `2ff9393` → Approve |
+| Merge squash bila commit perantara berantakan | 2 commit → `a3acf31` |
+| Issue tertutup otomatis | Body PR memuat `Closes #4` |
+| Branch dihapus setelah merge | `git branch --list "feat/*"` dan `git ls-remote --heads origin feat/notes-validation` kosong; `git remote prune origin` membersihkan ref lokal yang basi |
+
+### 6.5 Peta issue → PR
 
 | Issue | Judul | Branch | PR | Status |
 |---|---|---|---|---|
 | #1 | Rapikan nama package + format week5 agar analyze bersih | `chore/week5-hygiene` | PR #1 | Merged (`9623a4a`) |
 | #2 | Rapikan package + lint week7 | `chore/week7-hygiene` | PR #2 | Merged (`0e3c1fa`) |
 | #3 | CI: analyze + format + test pada PR | `chore/ci` | PR #3 | Merged (`6d4e684`) |
-| #4 | Validasi judul catatan kosong + test | `feat/notes-validation` | PR #4 | Merged (`a3acf31`) |
+| #4 | Validasi judul catatan kosong + test | `feat/notes-validation` | PR #4 | Merged (`a3acf31`), branch dihapus |
 | #5 | Rapikan package week6 (analyze bersih) | `chore/week6-hygiene` | PR #5 | Merged (`15c03df`) |
 | #6 | CI: sertakan week6 dalam matrix | `chore/ci-week6` | PR #6 | Merged (`368ec52`) |
-| #7 | Laporan mid review + checklist + AI review | `docs/week8-mid-review` | PR #7 | Open — untuk review sejawat |
+| #7 | Laporan mid review + checklist + AI review | `docs/week8-mid-review` | PR #7 | Merged ke `main` (fast-forward) |
 
 Riwayat integrasi:
 
@@ -418,8 +467,9 @@ flutter test
 ## 10. Checklist verifikasi mandiri
 
 - [x] Branch dari `develop`; `main` tidak disentuh setelah `develop` dibuat.
-- [x] PR kecil satu fitur (198 baris), issue tertutup via PR (`Closes #4`).
-- [x] Minimal 3 komentar review bermakna ditindaklanjuti hingga approve (R1–R4 + R5 ditolak beralasan).
+- [x] PR kecil satu fitur (198 baris) ke `develop`, issue tertutup via PR (`Closes #4`).
+- [x] Reviewer menghasilkan 2 temuan kebenaran (R1, R2), 1 arsitektur (R3), 1 test (R4), 1 keterbacaan (R5) — putaran 1 `Request changes`, putaran 2 `Approve`.
+- [x] Tindak lanjut → re-review → merge squash (`2ff9393` + `719f645` → `a3acf31`), branch fitur dihapus (lokal & remote).
 - [x] `flutter analyze` bersih di week5, week6, week7.
 - [x] `dart format` rapi (0 file berubah).
 - [x] `flutter test` hijau (8 + 19 + 24 = 51).
@@ -500,6 +550,11 @@ sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
     ├── 14-ai-proof.png                # bukti temuan AI (sebelum vs sesudah)
     ├── 15-analyze-w6.png              # flutter analyze week6
     ├── 16-test-w6.png                 # flutter test week6
+    ├── 17-pr-kecil.png                # Praktikum 2.1 — body PR kecil + ukuran diff
+    ├── 18-peer-review.png             # Praktikum 2.2 — 5 temuan reviewer (Request changes)
+    ├── 19-komentar-baik.png           # Praktikum 2.3 — pola observasi -> dampak -> usulan
+    ├── 20-re-review-approve.png       # Praktikum 2.4 — tindak lanjut + Approve
+    ├── 21-merge-cleanup.png           # Praktikum 2.4 — merge squash, issue closed, branch dihapus
     ├── app-week5-notes.png            # screenshot aplikasi week5
     └── app-week6-fcm.png              # screenshot aplikasi week6
 ```
