@@ -458,7 +458,9 @@ fitur paruh kedua.
 
 ## 8. AI Challenge
 
-Prompt yang dipakai:
+### 8.1 Prompt dan output awal
+
+![Prompt AI](screenshots/25-ai-prompt.png)
 
 ```text
 Review PR Flutter ini sebagai senior Flutter dev.
@@ -469,21 +471,57 @@ Berikan 5 temuan teratas + level (blocker/saran)
 + alasan + usulan potongan kode perbaikan.
 ```
 
-Dokumentasi lengkap: **[`docs/ai-review-vs-keputusan.md`](docs/ai-review-vs-keputusan.md)**.
+Konteks tambahan yang diberikan: diff `719f645` pada
+`week5_local_storage_offline_first`, **bukan** week7 — karena week5 masih
+layer-first (`lib/data`, `lib/pages`) dan belum memakai clean architecture.
+
+![Output awal AI](screenshots/26-ai-output.png)
+
+Dokumentasi lengkap (prompt, output, tabel keputusan, bukti):
+**[`docs/ai-review-vs-keputusan.md`](docs/ai-review-vs-keputusan.md)**.
+
+### 8.2 Verifikasi sebelum menerapkan
+
+![Verifikasi AI](screenshots/27-ai-verifikasi.png)
+
+Checklist jobsheet dijawab eksplisit:
+
+| Pertanyaan | Jawaban |
+|---|---|
+| Apakah temuan benar-benar ada? | A1, A2 **ya** — grep di commit lama kosong, di commit sekarang ada. A1 diuji lebih keras dengan **uji balik**: guard dihapus → test gagal (`Expected: throws ArgumentError`, `Actual: Future<Note>`), lalu dikembalikan → hijau. |
+| Apakah usulan melanggar dependency rule? | Tidak ada yang membuat `domain` mengimpor Flutter/Dio/SQLite. A3 tetap ditolak karena menambah layer baru ke project yang belum clean architecture. |
+| Apakah AI hanya nitpick style? | A4, A5 mendekati nitpick (tidak menghilangkan bug) → ditolak; style diserahkan ke `dart format` + `flutter analyze` di CI. |
+
+### 8.3 Tabel usulan vs keputusan final
+
+![Usulan vs keputusan](screenshots/28-ai-keputusan.png)
 
 | ID | Temuan AI | Level | Keputusan | Bukti |
 |---|---|---|---|---|
-| A1 | Validasi hanya di UI, repository masih menerima judul kosong | blocker | **Diterima** | `git show 6d4e684:.../note_repository.dart \| grep validate` → kosong; sekarang baris 27 |
-| A2 | `TextEditingController` tidak pernah di-`dispose()` | blocker | **Diterima** | `git show 6d4e684:.../notes_page.dart \| grep dispose` → kosong |
+| A1 | Validasi hanya di UI, repository masih menerima judul kosong | blocker | **Diterima** | `git show 6d4e684:.../note_repository.dart \| grep validate` → kosong; sekarang baris 27, sebelum `_openDb()` baris 32; uji balik membuat test gagal |
+| A2 | `TextEditingController` tidak pernah di-`dispose()` | blocker | **Diterima** | `git show 6d4e684:.../notes_page.dart \| grep dispose` → kosong; sekarang `add_note_dialog.dart:17-19` |
 | A3 | Ganti `ArgumentError` dengan `Either<Failure, Note>` | blocker | **Ditolak** | Week5 bukan clean architecture; judul kosong bukan kegagalan domain |
 | A4 | Pakai `Form` + `GlobalKey<FormState>` | saran | **Ditolak** | Tidak mengubah perilaku, menambah state global |
 | A5 | Pindahkan validasi ke provider Riverpod | saran | **Ditolak** | `validateNoteTitle` fungsi murni; membungkusnya memperberat test |
 
 ![Bukti temuan AI](screenshots/14-ai-proof.png)
 
-Dua temuan AI terbukti benar dengan bukti grep, satu di antaranya (A2) adalah bug
-berupa *absence* yang tidak terlihat dari diff biasa. Tiga saran ditolak karena
+Dua temuan AI terbukti benar dengan bukti grep (A1 kini juga dibuktikan dengan
+test gagal saat guard dilepas), satu di antaranya (A2) adalah bug berupa
+*absence* yang tidak terlihat dari diff biasa. Tiga saran ditolak karena
 melanggar konteks arsitektur atau hanya menambah kode tanpa menghilangkan bug.
+
+### 8.4 Bisa dijelaskan tanpa catatan AI
+
+| Temuan | Penjelasan lisan yang disiapkan |
+|---|---|
+| A1 | Repository adalah pintu terakhir sebelum SQLite. Validasi hanya di UI membuat jalur sync/import bisa menulis judul kosong. Guard 5 baris diletakkan **sebelum** `_openDb()` agar DB tidak pernah dibuka untuk input tidak sah, dan dijaga test yang terbukti gagal bila guard dihapus. |
+| A2 | `TextEditingController` adalah resource. Tanpa `dispose()` ia bocor setiap dialog dibuka, jadi dialog dipindah ke `StatefulWidget` agar punya pemilik. Efek sampingnya: 3 widget test baru. |
+| A3 | `Either<Failure, Note>` adalah pola week7. Menyalinnya ke week5 menambah layer tanpa menghilangkan bug; judul kosong adalah pelanggaran kontrak pemanggil, bukan kegagalan domain. |
+| A4/A5 | `Form` dan `StateNotifier` tidak mengubah perilaku, hanya menambah state yang harus dikelola. Untuk satu field, `errorText` lebih sederhana dan sudah bisa diuji lewat `find.text(...)`. |
+
+Syarat jobsheet terpenuhi: **2 temuan terbukti benar** (A1, A2) dan **3 ditolak
+dengan alasan tertulis** (A3, A4, A5).
 
 ---
 
@@ -534,7 +572,8 @@ flutter test
 - [x] `flutter analyze` bersih di week5, week6, week7.
 - [x] `dart format` rapi (0 file berubah).
 - [x] `flutter test` hijau (8 + 19 + 24 = 51).
-- [x] Tabel usulan AI vs keputusan final terdokumentasi di `docs/`.
+- [x] Tabel usulan AI vs keputusan final terdokumentasi di `docs/` (2 diterima dengan bukti, 3 ditolak beralasan).
+- [x] Prompt, output awal AI, dan bukti test/analyze tersimpan di `docs/ai-review-vs-keputusan.md`.
 - [x] README memuat status paruh semester, peta issue/PR, fitur, stack, cara menjalankan, dan screenshot.
 
 ---
@@ -619,6 +658,10 @@ sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
     ├── 22-static-analysis.png         # Praktikum 3.1 — analyze/format/test hijau di 3 project
     ├── 23-ci-menolak-kotor.png        # Praktikum 3.2 — gate CI terbukti menolak (exit 1)
     ├── 24-kesiapan-mid-review.png     # Praktikum 3.3 — sterilitas + nilai kesiapan + DoD
+    ├── 25-ai-prompt.png               # AI Challenge — prompt + konteks PR
+    ├── 26-ai-output.png               # AI Challenge — output awal 5 temuan
+    ├── 27-ai-verifikasi.png           # AI Challenge — grep + uji balik membuktikan A1/A2
+    ├── 28-ai-keputusan.png            # AI Challenge — usulan vs keputusan + bukti mesin
     ├── app-week5-notes.png            # screenshot aplikasi week5
     └── app-week6-fcm.png              # screenshot aplikasi week6
 ```
