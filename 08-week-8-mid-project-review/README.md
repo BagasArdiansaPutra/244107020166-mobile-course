@@ -527,7 +527,42 @@ dengan alasan tertulis** (A3, A4, A5).
 
 ## 9. Refactoring, testing, dan error umum
 
-### Ukuran PR (semua < 300 baris)
+### 9.1 Refactoring challenge: memecah PR besar
+
+Dokumen lengkap: **[`docs/refactoring-split.md`](docs/refactoring-split.md)**.
+
+![Split PR besar](screenshots/29-refactor-split.png)
+
+PR terbesar yang isinya bisa direview manusia adalah `91468ae` (laporan mid
+review): **23 file, +970 baris**. Angka ini diukur, bukan diperkirakan:
+
+```
+$ git show --shortstat --format="" 91468ae
+ 23 files changed, 970 insertions(+)
+```
+
+| Urutan | Judul PR | Isi | File | Baris | Estimasi |
+|---|---|---|---|---|---|
+| **PR-A** | `docs(week8): checklist commit dan body PR` | `review-checklist.md` + `pr-notes-validation.md` | 2 | **193** | ~8 menit |
+| **PR-B** | `docs(week8): peer review dan AI review` | `peer-review-notes-validation.md` + `ai-review-vs-keputusan.md` | 2 | **282** | ~12 menit |
+| **PR-C** | `docs(week8): README laporan dan screenshot` | `README.md` + 18 gambar | 19 | **495** | ~15 menit (prosa) |
+
+Urutannya tidak acak: **PR-A menetapkan aturan** (format commit, batas 300
+baris, template body PR), **PR-B membuktikan aturan dijalankan** (review sejawat
+dan keputusan AI), **PR-C merangkum keduanya** sehingga harus terakhir agar
+tautan dan angkanya final. PR-C melewati 300 baris karena 100% Markdown + gambar
+dan nol baris kode — yang direview adalah isi, bukan logika.
+
+Mengapa bukan `be47159` (319 file, +13.609)? Karena 90% isinya file generated
+platform; memecahnya tetap menyisakan ribuan baris per PR. Pelajarannya:
+project import tidak "dipecah setelah ditulis", tetapi **tidak pernah ditulis
+sebagai satu PR**.
+
+Praktikum ini sendiri dikirim sebagai tiga commit berurutan di `main`
+(dokumen ini → bukti testing → checklist), masing-masing < 300 baris, agar
+polanya terbukti dan bukan hanya direncanakan.
+
+### 9.2 Ukuran semua PR (semua < 300 baris)
 
 | PR | File | Baris |
 |---|---|---|
@@ -538,7 +573,11 @@ dengan alasan tertulis** (A3, A4, A5).
 | #5 week6 hygiene | 10 | +72 / −64 |
 | #6 CI week6 | 1 | +1 |
 
-### Review tanpa dijalankan tidak sah
+### 9.3 Review tanpa dijalankan tidak sah
+
+Dokumen bukti: **[`docs/testing-evidence.md`](docs/testing-evidence.md)**.
+
+![Bukti testing per PR](screenshots/31-testing-evidence.png)
 
 Setiap PR yang mengubah perilaku menyertakan bukti:
 
@@ -546,18 +585,53 @@ Setiap PR yang mengubah perilaku menyertakan bukti:
 flutter analyze
 dart format --output=none --set-exit-if-changed .
 flutter test
-# + langkah manual: buka app, tekan +, Simpan dengan field kosong, lihat error
+# + langkah manual 5 menit per fitur + screenshot
 ```
 
-### Error umum yang ditemui
+| PR | Ubah perilaku | analyze | format | test | Manual 5 menit |
+|---|---|---|---|---|---|
+| #1 week5 hygiene | tidak | 0 issue | 0 changed | 8 lulus | tidak perlu |
+| #2 week7 hygiene | tidak | 0 issue | 0 changed | 24 lulus | tidak perlu |
+| #3 CI | tidak | — | — | — | gate diuji gagal |
+| **#4 validasi judul** | **ya** | 0 issue | 0 changed | 8 lulus | **4 langkah** |
+| #5 week6 hygiene | tidak | 0 issue | 0 changed | 19 lulus | tidak perlu |
+| #6 CI week6 | tidak | — | — | — | — |
 
-| Gejala | Penyebab | Solusi yang dipakai |
+Langkah manual PR #4 (5 menit), sekarang juga dikunci widget test:
+
+1. Tekan **+**, kosongkan field, tekan **Simpan** → error muncul, dialog tetap
+   terbuka, daftar tidak bertambah.
+2. Ketik satu huruf → pesan error hilang.
+3. Isi `  Belanja  ` → tersimpan sebagai `Belanja` (trim).
+
+### 9.4 Error umum dan solusinya
+
+![Error umum dan checklist](screenshots/32-error-checklist.png)
+
+| Gejala | Kasus nyata di repo ini | Solusi yang dipakai |
 |---|---|---|
+| PR 800 baris tak kunjung direview | `be47159`: 319 file, +13.609 (week5 + week6 dalam satu commit) | Pecah per modul; PR #1–#7 maksimal 198 baris (`docs/refactoring-split.md`) |
+| Konflik merge berulang | `feat/notes-validation` bentrok dengan hygiene branch di `note_repository.dart` | Rebase/pull `develop` harian, branch < 3 hari, konflik diselesaikan manual |
+| Review hanya debat spasi | `dart format` mengubah 29 file karena dijalankan dari root repo | Format per project + CI `--set-exit-if-changed` (exit `1`) |
+| Approve tapi bug lolos | R1 (error menempel) dan R2 (judul bocor ke log) tak terlihat dari diff | Reviewer checkout + jalankan test; widget test baru mengunci keduanya |
+| Saran AI merusak arsitektur | A3 `Either<Failure, Note>` di week5 yang belum clean architecture | Ditolak + bukti grep/test tertulis (`docs/ai-review-vs-keputusan.md`) |
 | `package_names` info | Nama package `_05_...` diawali underscore | Rename package + import test, bukan `// ignore` |
-| `dart format` mengubah 29 file sekaligus | Format dijalankan dari root repo (semua project) | Jalankan per project; PR tetap kecil |
 | Push ditolak setelah `git rebase develop` | Riwayat branch ditulis ulang | `git push --force-with-lease` pada branch fitur (bukan `develop`) |
-| Konflik saat rebase `feat/notes-validation` | Hygiene branch mengubah file yang sama (`note_repository.dart`) | Selesaikan konflik manual, `git add`, `git rebase --continue` |
 | `gh` tidak tersedia | CLI GitHub tidak terpasang di mesin praktikum | Merge lokal bergaya PR + body PR disimpan di `docs/` |
+
+### 9.5 Checklist verifikasi mandiri
+
+| Syarat | Status | Bukti |
+|---|---|---|
+| Branch dari `develop`, PR kecil satu fitur, issue tertutup via PR | Terpenuhi | `feat/notes-validation` dari `develop`, 7 file/198 baris, `Closes #4` |
+| Minimal 3 komentar review bermakna ditindaklanjuti hingga approve | Terpenuhi | R1–R4 diterapkan, R5 ditolak beralasan; putaran 2 `Approve` |
+| `flutter analyze` bersih, `dart format` rapi, `flutter test` hijau | Terpenuhi | 0 issue, 0 changed, 51 test (8 + 19 + 24) |
+| Tabel usulan AI vs keputusan final terdokumentasi di `docs/` | Terpenuhi | `docs/ai-review-vs-keputusan.md` — 2 diterima, 3 ditolak |
+
+- [x] Tidak ada PR berstatus `Request changes` yang di-merge.
+- [x] Temuan style berulang dipindah ke otomatisasi (`dart format` + CI), bukan
+      diulang di komentar review.
+- [x] Satu PR > 300 baris dipecah menjadi 3 PR berurutan.
 
 ---
 
@@ -574,6 +648,8 @@ flutter test
 - [x] `flutter test` hijau (8 + 19 + 24 = 51).
 - [x] Tabel usulan AI vs keputusan final terdokumentasi di `docs/` (2 diterima dengan bukti, 3 ditolak beralasan).
 - [x] Prompt, output awal AI, dan bukti test/analyze tersimpan di `docs/ai-review-vs-keputusan.md`.
+- [x] Satu PR > 300 baris dipecah menjadi 3 PR berurutan (`docs/refactoring-split.md`).
+- [x] Bukti testing per PR + langkah manual 5 menit tersimpan di `docs/testing-evidence.md`.
 - [x] README memuat status paruh semester, peta issue/PR, fitur, stack, cara menjalankan, dan screenshot.
 
 ---
@@ -632,7 +708,9 @@ sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
 │   ├── review-checklist.md            # tabel sebelum/sesudah commit + kesiapan mid review
 │   ├── pr-notes-validation.md         # body PR (masalah, solusi, cara uji, hasil mesin)
 │   ├── peer-review-notes-validation.md# 5 temuan reviewer + keputusan
-│   └── ai-review-vs-keputusan.md      # prompt, output AI, tabel usulan vs keputusan, bukti
+│   ├── ai-review-vs-keputusan.md      # prompt, output AI, tabel usulan vs keputusan, bukti
+│   ├── refactoring-split.md           # pemecahan satu PR 970 baris jadi 3 PR kecil
+│   └── testing-evidence.md            # bukti uji per PR + langkah manual 5 menit
 └── screenshots/
     ├── 01-audit.png                   # git log / branch / status
     ├── 02-develop.png                 # pembuatan branch develop
@@ -662,6 +740,9 @@ sehingga jalur sync tidak bisa lagi menyimpan judul kosong.
     ├── 26-ai-output.png               # AI Challenge — output awal 5 temuan
     ├── 27-ai-verifikasi.png           # AI Challenge — grep + uji balik membuktikan A1/A2
     ├── 28-ai-keputusan.png            # AI Challenge — usulan vs keputusan + bukti mesin
+    ├── 29-refactor-split.png          # Praktikum 7.1 — satu PR 970 baris dipecah 3 PR
+    ├── 31-testing-evidence.png        # Praktikum 7.3 — bukti testing per PR + manual 5 menit
+    ├── 32-error-checklist.png         # Praktikum 7.4 — error umum + checklist mandiri
     ├── app-week5-notes.png            # screenshot aplikasi week5
     └── app-week6-fcm.png              # screenshot aplikasi week6
 ```
